@@ -1,22 +1,18 @@
-# oss-repo-template
-> 📄 a template for axodotdev's open source repositories
+# axolotlsay
+> 💬 a CLI for learning to build CLIs in rust
 
-This is a template repo for @axodotdev's open source projects.
 
-## Quickstart
+## Usage
 
-The README should contain a brief set of steps on how to go from installation to
-"Hello World". It should also link to more in depth and comprehensive install
-and usage documentation.
+```sh
+> axolotlsay "hello world"
 
-For a package, this should indicate how to add the package (e.g. cut and paste
-into `Cargo.toml`) and then a short example.
-
-For a cli, this should explain the preferred installation method and then offer
-the most common set of commands (e.g. `axo init && axo run`).
-
-The code block for the example or command set shouldn't exceed 20 lines, but
-exceptions can be made.
+         +-------------+
+         | hello world |
+         +-------------+
+        /
+≽(◕ ᴗ ◕)≼
+```
 
 ## License
 

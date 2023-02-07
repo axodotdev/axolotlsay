@@ -1,5 +1,5 @@
 # axolotlsay
-> 💬 a CLI for learning to build CLIs in rust
+> 💬 a CLI for learning to distribute CLIs in rust
 
 
 ## Usage

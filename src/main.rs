@@ -1,3 +1,4 @@
+#![allow(clippy::uninlined_format_args)]
 use clap::Parser;
 
 #[derive(Parser, Debug)]
@@ -9,9 +10,12 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    println!("         +----------------+");
-    println!("         | {} |", args.msg);
-    println!("         +----------------+");
+    let msg = &args.msg;
+    let dashes = "-".repeat(args.msg.len() + 2);
+
+    println!("         +{}+", dashes);
+    println!("         | {} |", msg);
+    println!("         +{}+", dashes);
     println!("        /");
     println!("≽(◕ ᴗ ◕)≼");
 }

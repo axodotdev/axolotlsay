@@ -8,3 +8,6 @@ repository = "https://github.com/axodotdev/axolotlsay"
 
 [dependencies]
 clap = { version = "4.1.4", features = ["derive"] }
+
+[dev-dependencies]
+assert_cmd = "2.0.8"

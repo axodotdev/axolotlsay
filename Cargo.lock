@@ -18,7 +18,7 @@ dependencies = [
 
 [[package]]
 name = "axolotlsay"
-version = "0.1.0-prerelease.5"
+version = "0.1.0-prerelease.6"
 dependencies = [
  "assert_cmd",
  "clap",

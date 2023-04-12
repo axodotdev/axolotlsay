@@ -18,10 +18,11 @@ dependencies = [
 
 [[package]]
 name = "axolotlsay"
-version = "0.0.0"
+version = "0.1.0-prerelease.1"
 dependencies = [
  "assert_cmd",
  "clap",
+ "unicode-width",
 ]
 
 [[package]]
@@ -329,6 +330,12 @@ name = "unicode-ident"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "84a22b9f218b40614adcb3f4ff08b703773ad44fa9423e4e0d346d5db86e4ebc"
+
+[[package]]
+name = "unicode-width"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c0edd1e5b14653f783770bce4a4dabb4a5108a5370a5f5d8cfe8710c361f6c8b"
 
 [[package]]
 name = "version_check"

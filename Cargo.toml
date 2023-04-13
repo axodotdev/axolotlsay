@@ -1,5 +1,5 @@
 [package]
-name = "axolotlsay"
+name = "cargodisttest"
 description = "💬 a CLI for learning to distribute CLIs in rust"
 version = "0.1.0-prerelease.6"
 edition = "2021"

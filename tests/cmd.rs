@@ -4,7 +4,7 @@ use assert_cmd::Command;
 fn it_works() {
     let msg = "hello world!";
     let axo = "≽(◕ ᴗ ◕)≼";
-    let mut cmd = Command::cargo_bin("axolotlsay").unwrap();
+    let mut cmd = Command::cargo_bin("cargodisttest").unwrap();
     let stdout = String::from_utf8(cmd.arg(msg).assert().get_output().stdout.clone()).unwrap();
 
     assert!(stdout.contains(axo));
@@ -14,7 +14,7 @@ fn it_works() {
 #[test]
 fn test_non_ascii() {
     let msg = "Привет, мир!!11адинадин";
-    let mut cmd = Command::cargo_bin("axolotlsay").unwrap();
+    let mut cmd = Command::cargo_bin("cargodisttest").unwrap();
     let response = cmd.arg(msg).assert().get_output().stdout.clone();
     let stdout = String::from_utf8(response).unwrap();
     let correct = r#"         +-------------------------+
@@ -29,7 +29,7 @@ fn test_non_ascii() {
 #[test]
 fn test_eeeeeee() {
     let msg = "éééééééééééé";
-    let mut cmd = Command::cargo_bin("axolotlsay").unwrap();
+    let mut cmd = Command::cargo_bin("cargodisttest").unwrap();
     let response = cmd.arg(msg).assert().get_output().stdout.clone();
     let stdout = String::from_utf8(response).unwrap();
     let correct = r#"         +--------------+
@@ -44,7 +44,7 @@ fn test_eeeeeee() {
 #[test]
 fn test_nihongo() {
     let msg = "やめてください";
-    let mut cmd = Command::cargo_bin("axolotlsay").unwrap();
+    let mut cmd = Command::cargo_bin("cargodisttest").unwrap();
     let response = cmd.arg(msg).assert().get_output().stdout.clone();
     let stdout = String::from_utf8(response).unwrap();
     let correct = r#"         +----------------+
@@ -59,7 +59,7 @@ fn test_nihongo() {
 #[test]
 fn test_rtl() {
     let msg = "لله أكبر ";
-    let mut cmd = Command::cargo_bin("axolotlsay").unwrap();
+    let mut cmd = Command::cargo_bin("cargodisttest").unwrap();
     let response = cmd.arg(msg).assert().get_output().stdout.clone();
     let stdout = String::from_utf8(response).unwrap();
     let correct = r#"         +-----------+

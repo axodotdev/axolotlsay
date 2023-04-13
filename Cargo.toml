@@ -5,6 +5,7 @@ version = "0.1.0-prerelease.8"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/gankra/axolotlsay"
+publish = false
 
 [dependencies]
 clap = { version = "4.1.4", features = ["derive"] }
@@ -31,3 +32,4 @@ installers = ["npm"]
 # Target platforms to build apps for (Rust target-triple syntax)
 targets = ["x86_64-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-pc-windows-msvc", "aarch64-apple-darwin"]
 npm-namespace = "@axodotdev"
+dist = true

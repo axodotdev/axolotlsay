@@ -1,5 +1,8 @@
-# axolotlsay
+# cargodisttest
+
 > 💬 a CLI for learning to distribute CLIs in rust
+
+(This is a fork of axolotlsay that we're fine with publishing junk versions of to test release workflows with.)
 
 
 ## Usage

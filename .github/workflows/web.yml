@@ -4,9 +4,9 @@ permissions:
   contents: write
 
 on:
-  push:
-    branches:
-      - main
+#  push:
+#    branches:
+#      - main
   workflow_run:
     workflows: ["Release"]
     types:

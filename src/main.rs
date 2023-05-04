@@ -1,10 +1,9 @@
-#![allow(clippy::uninlined_format_args)]
+#![allow(clippy::uninlined_format_args, clippy::correctness)]
 use clap::Parser;
 use unicode_width::UnicodeWidthStr;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
-#[allow(clippy::correctness)]
 struct Args {
     msg: String,
 }

@@ -1,6 +1,6 @@
 {
   "favicon": "https://www.axo.dev/favicon.ico",
-  "path_prefix": "cargodisttest",
+  "path_prefix": "axolotlsay",
   "md_book": "./docs/book/",
   "changelog": true,
   "social": {

@@ -1,4 +1,4 @@
-#![allow(clippy::uninlined_format_args, clippy::correctness)]
+#![allow(clippy::uninlined_format_args)]
 use clap::Parser;
 use unicode_width::UnicodeWidthStr;
 

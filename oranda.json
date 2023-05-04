@@ -1,0 +1,19 @@
+{
+  "favicon": "https://www.axo.dev/favicon.ico",
+  "path_prefix": "cargodisttest",
+  "md_book": "./docs/book/",
+  "changelog": true,
+  "social": {
+    "image": "https://www.axo.dev/meta_small.jpeg",
+    "image_alt": "axo",
+    "twitter_account": "@axodotdev"
+  },
+  "artifacts": {
+    "cargo_dist": true
+  },
+  "analytics": {
+    "plausible": {
+      "domain": "opensource.axo.dev"
+    }
+  }
+}

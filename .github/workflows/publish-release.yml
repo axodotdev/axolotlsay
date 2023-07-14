@@ -20,7 +20,6 @@ jobs:
           path: tag/
       - id: print-tag
         run: echo "tag=$(cat tag/tag_string)" >> "$GITHUB_OUTPUT"
-    runs-on: ubuntu-latest
 
   npm-publish:
     runs-on: ubuntu-latest

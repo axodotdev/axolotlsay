@@ -1,0 +1,53 @@
+name: PublishRelease
+
+on:
+  # Whenever a workflow called "AppendRelease" completes, run this!
+  workflow_run:
+    workflows: ["AppendRelease"]
+    types:
+        - completed
+
+jobs:
+  npm-publish:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm install -g npm
+      - run: npm ci
+      - run: npm publish --provenance --access public https://github.com/Gankra/axolotlsay/releases/download/{{ github.event.workflow_run.head_branch }}/cargodisttest-npm-package.tar.gz
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  cargo-publish:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - run: cargo publish --token ${CRATES_TOKEN}
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
+
+
+
+      
+
+
+
+
+

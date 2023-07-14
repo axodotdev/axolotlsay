@@ -8,16 +8,24 @@ on:
         - completed
 
 jobs:
-  print_context:
+  download-tag:
     runs-on: ubuntu-latest
+    outputs:
+        tag: ${{ steps.print-tag.outputs.tag }}
     steps:
-      - env:
-          EVENT_CONTEXT: ${{ toJSON(github.event) }}
-        run: |
-          echo $EVENT_CONTEXT
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: tag_string
+          path: tag/
+      - id: print-tag
+        run: echo "tag=$(cat tag/tag_string)" >> "$GITHUB_OUTPUT"
+    runs-on: ubuntu-latest
+
   npm-publish:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: download-tag
     permissions:
       contents: read
       id-token: write
@@ -29,13 +37,14 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm install -g npm
       # - run: npm ci
-      - run: echo "$"
-      - run: npm publish --access public https://github.com/Gankra/axolotlsay/releases/download/v0.3.12/cargodisttest-npm-package.tar.gz
+      - run: npm publish --access public https://github.com/Gankra/axolotlsay/releases/download/${{needs.download-tag.outputs.tag}}/cargodisttest-npm-package.tar.gz
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
   cargo-publish:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: download-tag
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2

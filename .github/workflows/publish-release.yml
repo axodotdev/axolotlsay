@@ -1,27 +1,27 @@
 name: PublishRelease
 
 on:
-  push:
-    tags:
-      - '*-?v[0-9]+*'
-    branches:
-      - 'main'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release Tag'
+        required: true
+        type: string
 
 jobs:
   # This is a bit convoluted so that the other parts of this workflow remain
-  # the same even if this is more complicated
+  # the same even if the way the tag is defined is more complicated
   download-tag:
     runs-on: ubuntu-latest
     outputs:
         tag: ${{ steps.print-tag.outputs.tag }}
     steps:
       - id: print-tag
-        run: echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+        run: echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
 
   # Publish the npm package we uploaded to the github release
   npm-publish:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     needs: download-tag
     permissions:
       contents: read
@@ -44,7 +44,6 @@ jobs:
   # publish the current repo state to crates.io
   cargo-publish:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     needs: download-tag
     steps:
       - name: Checkout sources

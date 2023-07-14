@@ -1,5 +1,9 @@
 name: PublishRelease
 
+# We're going to edit a gh release, so we need that permission
+permissions:
+  contents: write
+
 on:
   # Whenever a workflow called "AppendRelease" completes, run this!
   workflow_run:

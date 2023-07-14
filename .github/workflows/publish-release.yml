@@ -1,49 +1,22 @@
 name: PublishRelease
 
 on:
-  # Whenever a workflow called "AppendRelease" completes, run this!
-  workflow_run:
-    workflows: ["AppendRelease"]
-    types:
-        - completed
+  push:
+    tags:
+      - '*-?v[0-9]+*'
+    branches:
+      - 'main'
 
 jobs:
-  # This terrifying blob is just trying to get the git tag for the release,
-  # passed to us from the AppendRelease workflow that triggered us. This is
-  # horrifyingly the officially documented way to pass values between workflows
-  # when using workflow_run.
-  #
-  # (Nothing in the event payload mentions the tag, it seems to decay away
-  # when chaining together workflow_run stuff...)
+  # This is a bit convoluted so that the other parts of this workflow remain
+  # the same even if this is more complicated
   download-tag:
     runs-on: ubuntu-latest
     outputs:
         tag: ${{ steps.print-tag.outputs.tag }}
     steps:
-      - name: 'Download artifact'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-               run_id: context.payload.workflow_run.id,
-            });
-            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
-              return artifact.name == "tag_string"
-            })[0];
-            let download = await github.rest.actions.downloadArtifact({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-               artifact_id: matchArtifact.id,
-               archive_format: 'zip',
-            });
-            let fs = require('fs');
-            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/tag_string.zip`, Buffer.from(download.data));
-      - name: 'Unzip artifact'
-        run: unzip tag_string.zip
       - id: print-tag
-        run: echo "tag=$(cat tag_string)" >> "$GITHUB_OUTPUT"
+        run: echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
 
   # Publish the npm package we uploaded to the github release
   npm-publish:

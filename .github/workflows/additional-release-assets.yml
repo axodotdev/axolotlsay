@@ -35,18 +35,3 @@ jobs:
           curl --proto '=https' --tlsv1.2 -LsSf https://github.com/Gankra/axolotlsay/releases/download/${{ github.event.workflow_run.head_branch }}/cargodisttest-installer.sh | sh
           cargodisttest "hello" > cargodisttest-example.txt 
           gh release upload ${{ github.event.workflow_run.head_branch }} cargodisttest-example.txt
-
-  # upload the git tag so further workflows can use it
-  upload-tag:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Save tag
-        env:
-          TAG: ${{ github.event.workflow_run.head_branch }}
-        run: |
-          mkdir -p ./tag
-          echo $TAG > ./tag/tag_string
-      - uses: actions/upload-artifact@v3
-        with:
-          name: tag_string
-          path: tag/

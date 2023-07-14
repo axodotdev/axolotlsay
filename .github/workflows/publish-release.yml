@@ -55,7 +55,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout sources
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
         with:
           ref: ${{needs.download-tag.outputs.tag}}
           fetch-depth: 0

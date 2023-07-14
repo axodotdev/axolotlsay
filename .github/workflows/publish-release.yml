@@ -26,7 +26,8 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm install -g npm
       # - run: npm ci
-      - run: npm publish --provenance --access public https://github.com/Gankra/axolotlsay/releases/download/${{ github.event.workflow_run.head_branch }}/cargodisttest-npm-package.tar.gz
+      - run: echo "$"
+      - run: npm publish --provenance --access public https://github.com/Gankra/axolotlsay/releases/download/v0.3.10/cargodisttest-npm-package.tar.gz
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   cargo-publish:

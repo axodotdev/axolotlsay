@@ -9,12 +9,12 @@ on:
 
 jobs:
   print_context:
-  runs-on: ubuntu-latest
-  steps:
-    - env:
-        EVENT_CONTEXT: ${{ toJSON(github.event) }}
-      run: |
-        echo $EVENT_CONTEXT
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          EVENT_CONTEXT: ${{ toJSON(github.event) }}
+        run: |
+          echo $EVENT_CONTEXT
   npm-publish:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -30,7 +30,7 @@ jobs:
       - run: npm install -g npm
       # - run: npm ci
       - run: echo "$"
-      - run: npm publish --access public https://github.com/Gankra/axolotlsay/releases/download/v0.3.11/cargodisttest-npm-package.tar.gz
+      - run: npm publish --access public https://github.com/Gankra/axolotlsay/releases/download/v0.3.12/cargodisttest-npm-package.tar.gz
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   cargo-publish:

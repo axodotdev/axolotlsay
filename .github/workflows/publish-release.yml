@@ -13,14 +13,30 @@ jobs:
     outputs:
         tag: ${{ steps.print-tag.outputs.tag }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - name: 'Download artifact'
+        uses: actions/github-script@v6
         with:
-          name: tag_string
-          path: tag/
+          script: |
+            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: context.payload.workflow_run.id,
+            });
+            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "tag_string"
+            })[0];
+            let download = await github.rest.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: 'zip',
+            });
+            let fs = require('fs');
+            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/tag_string.zip`, Buffer.from(download.data));
+      - name: 'Unzip artifact'
+        run: unzip tag_string.zip
       - id: print-tag
-        run: echo "tag=$(cat tag/tag_string)" >> "$GITHUB_OUTPUT"
-
+        run: echo "tag=$(cat tag_string)" >> "$GITHUB_OUTPUT"
   npm-publish:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}

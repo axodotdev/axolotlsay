@@ -14,8 +14,9 @@ on:
 
 # Alright, let's do it!
 jobs:
-  schema:
-    name: Add schema to release
+  # upload the example
+  example:
+    name: Add example to release
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     runs-on: ubuntu-latest
@@ -24,6 +25,7 @@ jobs:
       # Setup
       - uses: actions/checkout@v3
         with:
+          ref: ${{ github.event.workflow_run.head_branch }}
           fetch-depth: 0
       # We get the tag of the release in github.event.workflow_run.head_branch
       # No idea why it's stored there with that name, but, it is?
@@ -33,7 +35,8 @@ jobs:
           curl --proto '=https' --tlsv1.2 -LsSf https://github.com/Gankra/axolotlsay/releases/download/${{ github.event.workflow_run.head_branch }}/cargodisttest-installer.sh | sh
           cargodisttest "hello" > cargodisttest-example.txt 
           gh release upload ${{ github.event.workflow_run.head_branch }} cargodisttest-example.txt
-  
+
+  # upload the git tag so further workflows can use it
   upload-tag:
     runs-on: ubuntu-latest
     steps:

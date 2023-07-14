@@ -8,6 +8,13 @@ on:
         - completed
 
 jobs:
+  # This terrifying blob is just trying to get the git tag for the release,
+  # passed to us from the AppendRelease workflow that triggered us. This is
+  # horrifyingly the officially documented way to pass values between workflows
+  # when using workflow_run.
+  #
+  # (Nothing in the event payload mentions the tag, it seems to decay away
+  # when chaining together workflow_run stuff...)
   download-tag:
     runs-on: ubuntu-latest
     outputs:
@@ -37,6 +44,8 @@ jobs:
         run: unzip tag_string.zip
       - id: print-tag
         run: echo "tag=$(cat tag_string)" >> "$GITHUB_OUTPUT"
+
+  # Publish the npm package we uploaded to the github release
   npm-publish:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -45,32 +54,35 @@ jobs:
       contents: read
       id-token: write
     steps:
+      - name: Checkout sources
       - uses: actions/checkout@v3
+        with:
+          ref: ${{needs.download-tag.outputs.tag}}
+          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
       - run: npm install -g npm
-      # - run: npm ci
       - run: npm publish --access public https://github.com/Gankra/axolotlsay/releases/download/${{needs.download-tag.outputs.tag}}/cargodisttest-npm-package.tar.gz
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+  # publish the current repo state to crates.io
   cargo-publish:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     needs: download-tag
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
-
-      - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
+        uses: actions/checkout@v3
         with:
-          profile: minimal
+          ref: ${{needs.download-tag.outputs.tag}}
+          fetch-depth: 0
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
           toolchain: stable
-          override: true
-
       - run: cargo publish --token ${CRATES_TOKEN}
         env:
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}

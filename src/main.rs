@@ -21,7 +21,7 @@ fn main() {
 }
 
 // Intentionally break the build on one platform
-#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+#[cfg(all(target_os = "linux", target_arch = "x86_64"))]
 fn blah() {
     blargh();
 }

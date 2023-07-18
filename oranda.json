@@ -1,19 +1,32 @@
 {
-  "favicon": "https://www.axo.dev/favicon.ico",
-  "path_prefix": "axolotlsay",
-  "md_book": "./docs/book/",
-  "changelog": true,
-  "social": {
-    "image": "https://www.axo.dev/meta_small.jpeg",
-    "image_alt": "axo",
-    "twitter_account": "@axodotdev"
+  "$schema": "https://github.com/axodotdev/oranda/releases/latest/download/oranda-config-schema.json",
+  "build": {
+    "path_prefix": "axolotlsay"
   },
-  "artifacts": {
-    "cargo_dist": true
+  "styles": {
+    "favicon": "https://www.axo.dev/favicon.ico"
   },
-  "analytics": {
-    "plausible": {
-      "domain": "opensource.axo.dev"
+  "components": {
+    "changelog": true,
+    "artifacts": {
+      "cargo_dist": true,
+      "package_managers": {
+        "npx": "npx @axodotdev/axolotlsay",
+        "crates.io": "cargo install axolotlsay --locked --profile=dist",
+        "binstall": "cargo binstall axolotlsay"
+      }
+    }
+  },
+  "marketing": {
+    "social": {
+      "image": "https://www.axo.dev/meta_small.jpeg",
+      "image_alt": "axo",
+      "twitter_account": "@axodotdev"
+    },
+    "analytics": {
+      "plausible": {
+        "domain": "opensource.axo.dev"
+      }
     }
   }
 }

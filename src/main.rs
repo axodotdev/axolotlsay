@@ -19,3 +19,9 @@ fn main() {
     println!("        /");
     println!("≽(◕ ᴗ ◕)≼");
 }
+
+// Intentionally break the build on one platform
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn blah() {
+    blargh();
+}

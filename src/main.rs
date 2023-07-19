@@ -10,6 +10,7 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
+
     let msg = &args.msg;
     let count = UnicodeWidthStr::width(args.msg.as_str());
     let dashes = "-".repeat(count + 2);

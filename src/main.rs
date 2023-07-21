@@ -19,9 +19,3 @@ fn main() {
     println!("        /");
     println!("≽(◕ ᴗ ◕)≼");
 }
-
-// Intentionally break the build on one platform
-#[cfg(all(target_os = "linux", target_arch = "x86_64"))]
-fn blah() {
-    blargh();
-}

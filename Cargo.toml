@@ -35,4 +35,4 @@ targets = ["x86_64-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-pc-windows
 # A namespace to use when publishing this package to the npm registry
 npm-scope = "@axodotdev"
 # Path that installers should place binaries in
-install-path = "~/.cargodisttest2"
+install-path = "~/My Cargodisttest Documents"

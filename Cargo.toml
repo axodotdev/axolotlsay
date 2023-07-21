@@ -34,5 +34,3 @@ unix-archive = ".tar.gz"
 targets = ["x86_64-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-pc-windows-msvc", "aarch64-apple-darwin"]
 # A namespace to use when publishing this package to the npm registry
 npm-scope = "@axodotdev"
-# Path that installers should place binaries in
-install-path = "~/My Cargodisttest Documents2/bin/"

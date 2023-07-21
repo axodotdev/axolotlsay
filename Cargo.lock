@@ -85,7 +85,7 @@ dependencies = [
 
 [[package]]
 name = "cargodisttest"
-version = "0.3.25"
+version = "0.3.26"
 dependencies = [
  "assert_cmd",
  "clap",

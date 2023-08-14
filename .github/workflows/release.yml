@@ -45,48 +45,37 @@ on:
       - '*-?v[0-9]+*'
 
 jobs:
-  create-release:
-    # Create the Github Release™ so the packages have something to be uploaded to
+  plan:
+    # run cargo dist plan to figure out what we're doing
     runs-on: ubuntu-latest
     outputs:
-      has-releases: ${{ steps.create-release.outputs.has-releases }}
-      val: ${{ fromJson(steps.create-release.outputs.plan) }}
+      val: ${{ steps.plan.outputs.manifest }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - uses: Swatinem/rust-cache@v2
+      - uses: swatinem/rust-cache@v2
       - name: Install cargo-dist
         run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=ci-plus cargo-dist"
-      - id: create-release
+      - id: plan
         run: |
           cargo dist plan --tag=${{ github.ref_name }} --output-format=json > dist-manifest.json
-          echo "dist plan ran successfully"
+          echo "cargo dist plan ran successfully"
           cat dist-manifest.json
+          echo "manifest=$(jq -c dist-manifest.json)" >> "$GITHUB_OUTPUT"
+      - name: "Upload dist-manifest.json"
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts
+          path: dist-manifest.json
 
-          # Create the Github Release™ based on what cargo-dist thinks it should be
-          ANNOUNCEMENT_TITLE=$(jq --raw-output ".announcement_title" dist-manifest.json)
-          IS_PRERELEASE=$(jq --raw-output ".announcement_is_prerelease" dist-manifest.json)
-          jq --raw-output ".announcement_github_body" dist-manifest.json > new_dist_announcement.md
-          gh release create ${{ github.ref_name }} --draft --prerelease="$IS_PRERELEASE" --title="$ANNOUNCEMENT_TITLE" --notes-file=new_dist_announcement.md
-          echo "created announcement!"
-
-          # Upload the manifest to the Github Release™
-          gh release upload ${{ github.ref_name }} dist-manifest.json
-          echo "uploaded manifest!"
-
-          # Disable all the upload-artifacts tasks if we have no actual releases
-          HAS_RELEASES=$(jq --raw-output ".releases != null" dist-manifest.json)
-          echo "has-releases=$HAS_RELEASES" >> "$GITHUB_OUTPUT"
-          echo "plan=$(jq -c "." dist-manifest.json)" >> "$GITHUB_OUTPUT"
-
-  upload-artifacts:
+  upload-dist-artifacts:
     # Build and packages all the things
-    needs: create-release
+    needs: plan
     # Let the initial task tell us to not run (currently very blunt)
-    if: ${{ needs.create-release.outputs.has-releases == 'true' }}
+    if: ${{ fromJson(needs.plan.outputs.val).releases != null }}
     strategy:
       fail-fast: false
       # Target platforms/runners are computed by cargo-dist in create-release.
@@ -99,7 +88,7 @@ jobs:
       # Typically there will be:
       # - 1 "global" task that builds universal installers
       # - N "local" tasks that build each platform's binaries and platform-specific installers
-      matrix: ${{ needs.create-release.outputs.val.github.artifacts-matrix }}
+      matrix: ${{ fromJson(needs.plan.outputs.val).ci.github.artifacts-matrix }}
     runs-on: ${{ matrix.runner }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -107,10 +96,15 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - uses: Swatinem/rust-cache@v2
+      - uses: swatinem/rust-cache@v2
       - name: Install cargo-dist
         run: ${{ matrix.install-dist }}
-      - name: Run cargo-dist
+      - id: cargo-dist
+        # We force bash here just because github makes it really hard to get values up
+        # to "real" actions without writing to env-vars, and writing to env-vars has
+        # inconsistent syntax between shell and powershell. cargo-dist and jq work fine
+        # in powershell.
+        shell: bash
         # This logic is a bit janky because it's trying to be a polyglot between
         # powershell and bash since this will run on windows, macos, and linux!
         # The two platforms don't agree on how to talk about env vars but they
@@ -122,20 +116,20 @@ jobs:
           cat dist-manifest.json
 
           # Parse out what we just built and upload it to the Github Release™
-          jq --raw-output ".artifacts[]?.path | select( . != null )" dist-manifest.json > uploads.txt
-          echo "uploading..."
-          cat uploads.txt
-          gh release upload ${{ github.ref_name }} $(cat uploads.txt)
-          echo "uploaded!"
+          echo "paths=$(jq --raw-output ".artifacts[]?.path | select( . != null )")" >> "$GITHUB_OUTPUT"
+      - name: "Upload artifacts"
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts
+          path: ${{ steps.cargo-dist.outputs.paths }}
 
   publish-release:
-    # Mark the Github Release™ as a non-draft now that everything has succeeded!
-    #
-    # Only run after all the other tasks, but it's ok if upload-artifacts was skipped
+    # Create a Github Release with all the results once everything is done,
+    # regardless of success. The release is only marked as non-draft if all tasks succeeded.
     needs:
-      - create-release
-      - upload-artifacts
-    if: ${{ always() && needs.create-release.result == 'success' && (needs.upload-artifacts.result == 'skipped' || needs.upload-artifacts.result == 'success') }}
+      - plan
+      - upload-dist-artifacts
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -143,6 +137,26 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - name: mark release as non-draft
+      - id: manifest
         run: |
-          gh release edit ${{ github.ref_name }} --draft=false
+          echo "${{ needs.plan.outputs.val }}" >> dist-manifest.json
+          echo "title=$(jq --raw-output ".announcement_title" dist-manifest.json)" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$(jq --raw-output ".announcement_is_prerelease" dist-manifest.json)" >> "$GITHUB_OUTPUT"
+          echo "body=$(jq --raw-output ".announcement_github_body" dist-manifest.json > new_dist_announcement.md)" >> "$GITHUB_OUTPUT"
+      - name: "Download artifacts"
+        uses: actions/download-artifact@v3
+        with:
+          name: artifacts
+          path: artifacts
+      - name: Create Release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag: ${{ github.ref }}
+          name: ${{ steps.manifest.outputs.title }}
+          body: ${{ steps.manifest.outputs.body }}
+          draft: ${{ needs.plan.result == 'success' && (needs.upload-dist-artifacts.result == 'skipped' || needs.upload-dist-artifacts.result == 'success') }}
+          prerelease: ${{ steps.manifest.outputs.prerelease }}
+          artifacts: "artifacts/*"

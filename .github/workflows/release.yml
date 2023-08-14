@@ -45,12 +45,12 @@ on:
       - '*-?v[0-9]+*'
 
 jobs:
-  # Create the Github Release™ so the packages have something to be uploaded to
   create-release:
+    # Create the Github Release™ so the packages have something to be uploaded to
     runs-on: ubuntu-latest
     outputs:
       has-releases: ${{ steps.create-release.outputs.has-releases }}
-      matrix: ${{ steps.create-release.outputs.matrix }}
+      ci: ${{ steps.create-release.outputs.matrix }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -58,7 +58,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/cargo-dist/releases/download/v0.1.0/cargo-dist-installer.sh | sh"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=ci-plus cargo-dist"
       - id: create-release
         run: |
           cargo dist plan --tag=${{ github.ref_name }} --output-format=json > dist-manifest.json
@@ -79,19 +79,27 @@ jobs:
           # Disable all the upload-artifacts tasks if we have no actual releases
           HAS_RELEASES=$(jq --raw-output ".releases != null" dist-manifest.json)
           echo "has-releases=$HAS_RELEASES" >> "$GITHUB_OUTPUT"
-          echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
+          echo "ci=$(jq -c ".ci.github" dist-manifest.json)" >> "$GITHUB_OUTPUT"
 
-  # Build and packages all the things
   upload-artifacts:
-    # Let the initial task tell us to not run (currently very blunt)
+    # Build and packages all the things
     needs: create-release
+    # Let the initial task tell us to not run (currently very blunt)
     if: ${{ needs.create-release.outputs.has-releases == 'true' }}
     strategy:
       fail-fast: false
-      # For these target platforms
-      matrix: ${{ fromJson(needs.create-release.outputs.matrix) }}   
-      
-    runs-on: ${{ matrix.os }}
+      # Target platforms/runners are computed by cargo-dist in create-release.
+      # Each member of the matrix has the following arguments:
+      #
+      # - runner: the github runner
+      # - dist-args: cli flags to pass to cargo dist
+      # - install-dist: expression to run to install cargo-dist on the runner
+      #
+      # Typically there will be:
+      # - 1 "global" task that builds universal installers
+      # - N "local" tasks that build each platform's binaries and platform-specific installers
+      matrix: ${{ fromJson(needs.create-release.outputs.ci).artifacts_matrix }}   
+    runs-on: ${{ matrix.runner }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -118,10 +126,13 @@ jobs:
           gh release upload ${{ github.ref_name }} $(cat uploads.txt)
           echo "uploaded!"
 
-  # Mark the Github Release™ as a non-draft now that everything has succeeded!
   publish-release:
+    # Mark the Github Release™ as a non-draft now that everything has succeeded!
+    #
     # Only run after all the other tasks, but it's ok if upload-artifacts was skipped
-    needs: [create-release, upload-artifacts]
+    needs:
+      - create-release
+      - upload-artifacts
     if: ${{ always() && needs.create-release.result == 'success' && (needs.upload-artifacts.result == 'skipped' || needs.upload-artifacts.result == 'success') }}
     runs-on: ubuntu-latest
     env:

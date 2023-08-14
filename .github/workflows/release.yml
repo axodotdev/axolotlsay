@@ -57,14 +57,14 @@ jobs:
         with:
           submodules: recursive
       - uses: swatinem/rust-cache@v2
-      - name: Install cargo-dist
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=ci-plus cargo-dist"
+      # - name: Install cargo-dist
+      #  run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=ci-plus cargo-dist"
       - id: plan
         run: |
-          cargo dist plan --tag=${{ github.ref_name }} --output-format=json > dist-manifest.json
+          # cargo dist plan --tag=${{ github.ref_name }} --output-format=json > dist-manifest.json
           echo "cargo dist plan ran successfully"
-          cat dist-manifest.json
-          echo "manifest=$(jq -c dist-manifest.json)" >> "$GITHUB_OUTPUT"
+          cat cached-dist-manifest.json
+          echo "manifest=$(jq -c "." cached-dist-manifest.json)" >> "$GITHUB_OUTPUT"
       - name: "Upload dist-manifest.json"
         uses: actions/upload-artifact@v3
         with:

@@ -39,6 +39,7 @@ on:
   push:
     tags:
       - '*-?v[0-9]+*'
+  pull_request:
 
 jobs:
   plan:
@@ -121,7 +122,7 @@ jobs:
     needs:
       - plan
       - upload-dist-artifacts
-    if: ${{ always() }}
+    if: ${{ always() && !github.event.pull_request }}
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

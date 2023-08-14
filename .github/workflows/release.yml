@@ -144,23 +144,12 @@ jobs:
         with:
           name: artifacts
           path: artifacts
-      - id: manifest
-        run: |
-          echo "title=$(jq --raw-output ".announcement_title" artifacts/cached-dist-manifest.json)" >> "$GITHUB_OUTPUT"
-          echo "prerelease=$(jq --raw-output ".announcement_is_prerelease" artifacts/cached-dist-manifest.json)" >> "$GITHUB_OUTPUT"
-          echo "body<<EOF" >> "$GITHUB_OUTPUT"
-          jq --raw-output ".announcement_github_body" artifacts/cached-dist-manifest.json >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
-      
       - name: Create Release
-        id: create_release
         uses: ncipollo/release-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
           tag: ${{ github.ref }}
-          name: ${{ steps.manifest.outputs.title }}
-          body: ${{ steps.manifest.outputs.body }}
+          name: ${{ fromJson(needs.plan.outputs.val).announcement_title }}
+          body: ${{ fromJson(needs.plan.outputs.val).announcement_github_body }}
           draft: ${{ needs.plan.result == 'success' && (needs.upload-dist-artifacts.result == 'skipped' || needs.upload-dist-artifacts.result == 'success') }}
-          prerelease: ${{ steps.manifest.outputs.prerelease }}
+          prerelease: ${{ fromJson(needs.plan.outputs.val).announcement_is_prerelease }}
           artifacts: "artifacts/*"

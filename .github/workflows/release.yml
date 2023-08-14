@@ -4,17 +4,12 @@
 # CI that:
 #
 # * checks for a Git Tag that looks like a release
-# * creates a Github Release™ and fills in its text
-# * builds artifacts with cargo-dist (executable-zips, installers)
-# * uploads those artifacts to the Github Release™
+# * builds artifacts with cargo-dist (binaries and installers)
+# * creates a Github Release™ and with those artifacts
 #
-# Note that the Github Release™ will be created before the artifacts,
-# so there will be a few minutes where the release has no artifacts
-# and then they will slowly trickle in, possibly failing. To make
-# this more pleasant we mark the release as a "draft" until all
-# artifacts have been successfully uploaded. This allows you to
-# choose what to do with partial successes and avoids spamming
-# anyone with notifications before the release is actually ready.
+# Note that if any artifact tasks fails, the Github Release™ will still be created
+# with as many values as possible, but will be marked as a "draft" so that you can
+# inspect it and decide what to do.
 name: Release
 
 permissions:
@@ -56,20 +51,19 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - uses: swatinem/rust-cache@v2
       # - name: Install cargo-dist
       #  run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=ci-plus cargo-dist"
       - id: plan
         run: |
           # cargo dist plan --tag=${{ github.ref_name }} --output-format=json > dist-manifest.json
           echo "cargo dist plan ran successfully"
-          cat cached-dist-manifest.json
-          echo "manifest=$(jq -c "." cached-dist-manifest.json)" >> "$GITHUB_OUTPUT"
+          cat dist-manifest.json
+          echo "manifest=$(jq -c "." dist-manifest.json)" >> "$GITHUB_OUTPUT"
       - name: "Upload dist-manifest.json"
         uses: actions/upload-artifact@v3
         with:
           name: artifacts
-          path: cached-dist-manifest.json
+          path: dist-manifest.json
 
   upload-dist-artifacts:
     # Build and packages all the things
@@ -105,15 +99,10 @@ jobs:
         # inconsistent syntax between shell and powershell. cargo-dist and jq work fine
         # in powershell.
         shell: bash
-        # This logic is a bit janky because it's trying to be a polyglot between
-        # powershell and bash since this will run on windows, macos, and linux!
-        # The two platforms don't agree on how to talk about env vars but they
-        # do agree on 'cat' and '$()' so we use that to marshal values between commands.
         run: |
           # Actually do builds and make zips and whatnot
           cargo dist build --tag=${{ github.ref_name }} --output-format=json ${{ matrix.dist-args }} > dist-manifest.json
-          echo "dist ran successfully"
-          cat dist-manifest.json
+          echo "cargo dist ran successfully"
 
           # Parse out what we just built and upload it to the Github Release™
           echo "paths<<EOF" >> "$GITHUB_OUTPUT"
@@ -150,6 +139,6 @@ jobs:
           tag: ${{ github.ref }}
           name: ${{ fromJson(needs.plan.outputs.val).announcement_title }}
           body: ${{ fromJson(needs.plan.outputs.val).announcement_github_body }}
-          draft: ${{ needs.plan.result == 'success' && (needs.upload-dist-artifacts.result == 'skipped' || needs.upload-dist-artifacts.result == 'success') }}
+          draft: ${{ !(needs.plan.result == 'success' && (needs.upload-dist-artifacts.result == 'skipped' || needs.upload-dist-artifacts.result == 'success')) }}
           prerelease: ${{ fromJson(needs.plan.outputs.val).announcement_is_prerelease }}
           artifacts: "artifacts/*"

@@ -50,6 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       has-releases: ${{ steps.create-release.outputs.has-releases }}
+      matrix: ${{ steps.create-release.outputs.matrix }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -57,7 +58,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=neo-install-path cargo-dist"
+        run: "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/cargo-dist/releases/download/v0.1.0/cargo-dist-installer.sh | sh"
       - id: create-release
         run: |
           cargo dist plan --tag=${{ github.ref_name }} --output-format=json > dist-manifest.json
@@ -78,6 +79,7 @@ jobs:
           # Disable all the upload-artifacts tasks if we have no actual releases
           HAS_RELEASES=$(jq --raw-output ".releases != null" dist-manifest.json)
           echo "has-releases=$HAS_RELEASES" >> "$GITHUB_OUTPUT"
+          echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
 
   # Build and packages all the things
   upload-artifacts:
@@ -86,25 +88,9 @@ jobs:
     if: ${{ needs.create-release.outputs.has-releases == 'true' }}
     strategy:
       fail-fast: false
-      matrix:
-        # For these target platforms
-        include:
-        - os: "ubuntu-20.04"
-          dist-args: "--artifacts=global"
-          install-dist: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=neo-install-path cargo-dist"
-        - os: "macos-11"
-          dist-args: "--artifacts=local --target=aarch64-apple-darwin"
-          install-dist: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=neo-install-path cargo-dist"
-        - os: "macos-11"
-          dist-args: "--artifacts=local --target=x86_64-apple-darwin"
-          install-dist: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=neo-install-path cargo-dist"
-        - os: "windows-2019"
-          dist-args: "--artifacts=local --target=x86_64-pc-windows-msvc"
-          install-dist: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=neo-install-path cargo-dist"
-        - os: "ubuntu-20.04"
-          dist-args: "--artifacts=local --target=x86_64-unknown-linux-gnu"
-          install-dist: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=neo-install-path cargo-dist"
-
+      # For these target platforms
+      matrix: ${{ fromJson(needs.setup.outputs.mymatrix) }}   
+      
     runs-on: ${{ matrix.os }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

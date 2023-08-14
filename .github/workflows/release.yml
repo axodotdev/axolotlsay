@@ -146,7 +146,6 @@ jobs:
           path: artifacts
       - id: manifest
         run: |
-          echo "${{ needs.plan.outputs.val }}" >> artifacts/cached-dist-manifest.json
           echo "title=$(jq --raw-output ".announcement_title" artifacts/cached-dist-manifest.json)" >> "$GITHUB_OUTPUT"
           echo "prerelease=$(jq --raw-output ".announcement_is_prerelease" artifacts/cached-dist-manifest.json)" >> "$GITHUB_OUTPUT"
           echo "body<<EOF" >> "$GITHUB_OUTPUT"

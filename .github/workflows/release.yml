@@ -69,7 +69,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: artifacts
-          path: dist-manifest.json
+          path: cached-dist-manifest.json
 
   upload-dist-artifacts:
     # Build and packages all the things

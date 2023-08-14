@@ -30,7 +30,8 @@ permissions:
 # packages versioned/released in lockstep).
 #
 # If you push multiple tags at once, separate instances of this workflow will
-# spin up, creating an independent Github Release™ for each one.
+# spin up, creating an independent Github Release™ for each one (unfortunately
+# github will drop some tags on the ground if you push more than 3 at once).
 #
 # If there's a prerelease-style suffix to the version then the Github Release™
 # will be marked as a prerelease.
@@ -51,11 +52,11 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      # - name: Install cargo-dist
-      #  run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=ci-plus cargo-dist"
+      - name: Install cargo-dist
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=ci-plus cargo-dist"
       - id: plan
         run: |
-          # cargo dist plan --tag=${{ github.ref_name }} --output-format=json > dist-manifest.json
+          cargo dist plan --tag=${{ github.ref_name }} --output-format=json > dist-manifest.json
           echo "cargo dist plan ran successfully"
           cat dist-manifest.json
           echo "manifest=$(jq -c "." dist-manifest.json)" >> "$GITHUB_OUTPUT"
@@ -139,6 +140,6 @@ jobs:
           tag: ${{ github.ref }}
           name: ${{ fromJson(needs.plan.outputs.val).announcement_title }}
           body: ${{ fromJson(needs.plan.outputs.val).announcement_github_body }}
-          draft: ${{ !(needs.plan.result == 'success' && (needs.upload-dist-artifacts.result == 'skipped' || needs.upload-dist-artifacts.result == 'success')) }}
+          draft: ${{ failure() }}
           prerelease: ${{ fromJson(needs.plan.outputs.val).announcement_is_prerelease }}
           artifacts: "artifacts/*"

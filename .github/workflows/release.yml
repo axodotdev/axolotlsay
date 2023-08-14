@@ -80,7 +80,7 @@ jobs:
           # Disable all the upload-artifacts tasks if we have no actual releases
           HAS_RELEASES=$(jq --raw-output ".releases != null" dist-manifest.json)
           echo "has-releases=$HAS_RELEASES" >> "$GITHUB_OUTPUT"
-          echo "plan=$(jq -c dist-manifest.json)" >> "$GITHUB_OUTPUT"
+          echo "plan=$(jq -c "." dist-manifest.json)" >> "$GITHUB_OUTPUT"
 
   upload-artifacts:
     # Build and packages all the things

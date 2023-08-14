@@ -116,7 +116,8 @@ jobs:
           cat dist-manifest.json
 
           # Parse out what we just built and upload it to the Github Release™
-          echo "paths=$(jq --raw-output ".artifacts[]?.path | select( . != null )")" >> "$GITHUB_OUTPUT"
+          echo "paths=$(jq --raw-output ".artifacts[]?.path | select( . != null )" dist-manifest.json)" >> "$GITHUB_OUTPUT"
+
       - name: "Upload artifacts"
         uses: actions/upload-artifact@v3
         with:

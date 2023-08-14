@@ -99,7 +99,7 @@ jobs:
       # Typically there will be:
       # - 1 "global" task that builds universal installers
       # - N "local" tasks that build each platform's binaries and platform-specific installers
-      matrix: ${{ fromJson(needs.create-release.outputs.ci).artifacts_matrix }}   
+      matrix: ${{ fromJson(needs.create-release.outputs.ci).artifacts-matrix }}   
     runs-on: ${{ matrix.runner }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -89,7 +89,7 @@ jobs:
     strategy:
       fail-fast: false
       # For these target platforms
-      matrix: ${{ fromJson(needs.setup.outputs.mymatrix) }}   
+      matrix: ${{ fromJson(needs.create-release.outputs.matrix) }}   
       
     runs-on: ${{ matrix.os }}
     env:

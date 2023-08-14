@@ -134,12 +134,15 @@ jobs:
         with:
           name: artifacts
           path: artifacts
+      - name: "debug"
+        run: |
+          echo "${{ github.action_status }}"
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.ref }}
           name: ${{ fromJson(needs.plan.outputs.val).announcement_title }}
           body: ${{ fromJson(needs.plan.outputs.val).announcement_github_body }}
-          draft: ${{ github.action_status == 'success' }}
+          draft: ${{ github.action_status != 'success' }}
           prerelease: ${{ fromJson(needs.plan.outputs.val).announcement_is_prerelease }}
           artifacts: "artifacts/*"

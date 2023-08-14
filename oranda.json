@@ -1,19 +1,24 @@
 {
   "$schema": "https://github.com/axodotdev/oranda/releases/latest/download/oranda-config-schema.json",
   "build": {
-    "path_prefix": "axolotlsay"
+    "path_prefix": "cargodisttest"
   },
   "styles": {
-    "favicon": "https://www.axo.dev/favicon.ico"
+    "favicon": "https://www.axo.dev/favicon.ico",
+    "theme": "axodark"
   },
   "components": {
     "changelog": true,
     "artifacts": {
       "cargo_dist": true,
       "package_managers": {
-        "npx": "npx @axodotdev/axolotlsay",
-        "crates.io": "cargo install axolotlsay --locked --profile=dist",
-        "binstall": "cargo binstall axolotlsay"
+        "preferred": {
+          "npx": "npx @axodotdev/cargodisttest"
+        },
+        "additional": {
+          "crates.io": "cargo install cargodisttest --locked --profile=dist",
+          "binstall": "cargo binstall cargodisttest"
+        }
       }
     }
   },

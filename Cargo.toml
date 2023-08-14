@@ -4,7 +4,7 @@ description = "💬 a CLI for learning to distribute CLIs in rust"
 version = "0.3.28"
 edition = "2021"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/gankra/axolotlsay"
+repository = "https://github.com/gankra/cargodisttest"
 
 [dependencies]
 clap = { version = "4.1.4", features = ["derive"] }

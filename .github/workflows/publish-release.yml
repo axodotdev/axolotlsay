@@ -37,7 +37,7 @@ jobs:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
       - run: npm install -g npm
-      - run: npm publish --access public https://github.com/Gankra/axolotlsay/releases/download/${{needs.download-tag.outputs.tag}}/cargodisttest-npm-package.tar.gz
+      - run: npm publish --access public https://github.com/Gankra/cargodisttest/releases/download/${{needs.download-tag.outputs.tag}}/cargodisttest-npm-package.tar.gz
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

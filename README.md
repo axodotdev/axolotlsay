@@ -8,7 +8,7 @@
 ## Usage
 
 ```sh
-> axolotlsay "hello world"
+> cargodisttest "hello world"
 
          +-------------+
          | hello world |

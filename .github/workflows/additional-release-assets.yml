@@ -32,6 +32,6 @@ jobs:
       - name: Install oranda and upload schema
         run: |
           echo "uploading schema to ${{ github.event.workflow_run.head_branch }}"
-          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/Gankra/axolotlsay/releases/download/${{ github.event.workflow_run.head_branch }}/cargodisttest-installer.sh | sh
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/Gankra/cargodisttest/releases/download/${{ github.event.workflow_run.head_branch }}/cargodisttest-installer.sh | sh
           cargodisttest "hello" > cargodisttest-example.txt 
           gh release upload ${{ github.event.workflow_run.head_branch }} cargodisttest-example.txt

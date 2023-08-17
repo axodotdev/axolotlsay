@@ -190,7 +190,7 @@ jobs:
 
             git add Formula/${name}.rb
             git commit -m '${name} ${version}'
-          fi
+          done
           git push
 
   # Mark the Github Release™ as a non-draft now that everything has succeeded!

@@ -170,7 +170,6 @@ jobs:
 
   upload-homebrew-formula:
     needs: upload-local-artifacts
-    if: "mistydemeo/cargodisttest"
     runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

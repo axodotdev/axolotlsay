@@ -181,7 +181,7 @@ jobs:
       # So we have access to the formula
       - name: Fetch local artifacts
         run: |
-          gh release download ${{ github.ref_name }} --dir Formula
+          gh release download ${{ github.ref_name }} --dir Formula --repo ${GITHUB_REPOSITORY}
       - name: Commit formula files
         run: |
           for release in $(echo $RELEASES | jq --compact-output '.[]'); do

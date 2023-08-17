@@ -184,7 +184,7 @@ jobs:
           gh release download ${{ github.ref_name }} --dir Formula
       - name: Commit formula files
         run: |
-          for release in $(echo $RELEASES | jq --compact-output '.[]'}; do
+          for release in $(echo $RELEASES | jq --compact-output '.[]'); do
             name=$(echo $release | jq .app_name)
             version=$(echo $release | jq.app_version)
 

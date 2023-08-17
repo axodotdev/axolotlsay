@@ -80,7 +80,6 @@ jobs:
           # Disable all the upload-artifacts tasks if we have no actual releases
           HAS_RELEASES=$(jq --raw-output ".releases != null" dist-manifest.json)
           echo "has-releases=$HAS_RELEASES" >> "$GITHUB_OUTPUT"
-          echo "releases=$(jq --compact-output ".releases")" >> "$GITHUB_OUTPUT"
 
   # Build and packages all the platform-specific things
   upload-local-artifacts:
@@ -132,6 +131,7 @@ jobs:
           cat uploads.txt
           gh release upload ${{ github.ref_name }} $(cat uploads.txt)
           echo "uploaded!"
+          echo "releases=$(jq --compact-output ".releases" dist-manifest.json)" >> "$GITHUB_OUTPUT"
 
   # Build and packages all the platform-agnostic(ish) things
   upload-global-artifacts:
@@ -174,7 +174,7 @@ jobs:
     runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      RELEASES: ${{ releases }}
+      RELEASES: ${{ needs.upload-local-artifacts.outputs.releases }}
     steps:
       - uses: actions/checkout@v3
         with:

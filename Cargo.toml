@@ -29,7 +29,7 @@ ci = ["github"]
 # The installers to generate for each app
 installers = ["shell", "homebrew"]
 # A GitHub repo to push the Homebrew formula to
-tap = "mistydemeo/cargodisttest"
+tap = "mistydemeo/homebrew-cargodisttest"
 # Target platforms to build apps for (Rust target-triple syntax)
 targets = ["x86_64-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-pc-windows-msvc", "aarch64-apple-darwin"]
 # The archive format to use for windows builds (defaults .zip)

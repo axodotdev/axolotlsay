@@ -177,7 +177,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          repository: "mistydemeo/cargodisttest"
+          repository: "mistydemeo/homebrew-cargodisttest"
       # So we have access to the formula
       - name: Fetch local artifacts
         run: |

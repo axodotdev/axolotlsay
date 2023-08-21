@@ -177,6 +177,8 @@ jobs:
         with:
           repository: "mistydemeo/homebrew-cargodisttest"
           token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+      - name: Install cargo-dist
+        run: {{{ global_task.install_dist }}}
       # So we have access to the formula
       - name: Fetch local artifacts
         run: |

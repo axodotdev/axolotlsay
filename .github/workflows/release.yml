@@ -190,8 +190,8 @@ jobs:
       - name: Commit formula files
         run: |
           for release in $(echo $RELEASES | jq --compact-output '.[]'); do
-            name=$(echo $release | jq .app_name)
-            version=$(echo $release | jq .app_version)
+            name=$(echo $release | jq .app_name --raw-output)
+            version=$(echo $release | jq .app_version --raw-output)
 
             git add Formula/${name}.rb
             git commit -m '${name} ${version}'

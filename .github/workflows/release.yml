@@ -131,7 +131,6 @@ jobs:
           cat uploads.txt
           gh release upload ${{ github.ref_name }} $(cat uploads.txt)
           echo "uploaded!"
-          echo "releases=$(jq --compact-output ".releases" dist-manifest.json)" >> "$GITHUB_OUTPUT"
 
   # Build and packages all the platform-agnostic(ish) things
   upload-global-artifacts:
@@ -167,17 +166,18 @@ jobs:
           cat uploads.txt
           gh release upload ${{ github.ref_name }} $(cat uploads.txt)
           echo "uploaded!"
-
+          echo "releases=$(jq --compact-output ".releases" dist-manifest.json)" >> "$GITHUB_OUTPUT"
   upload-homebrew-formula:
-    needs: upload-local-artifacts
+    needs: upload-global-artifacts
     runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      RELEASES: ${{ needs.upload-local-artifacts.outputs.releases }}
+      RELEASES: ${{ needs.upload-global-artifacts.outputs.releases }}
     steps:
       - uses: actions/checkout@v3
         with:
           repository: "mistydemeo/homebrew-cargodisttest"
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
       # So we have access to the formula
       - name: Fetch local artifacts
         run: |
@@ -186,7 +186,7 @@ jobs:
         run: |
           for release in $(echo $RELEASES | jq --compact-output '.[]'); do
             name=$(echo $release | jq .app_name)
-            version=$(echo $release | jq.app_version)
+            version=$(echo $release | jq .app_version)
 
             git add Formula/${name}.rb
             git commit -m '${name} ${version}'

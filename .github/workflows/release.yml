@@ -169,9 +169,7 @@ jobs:
           cat uploads.txt
           gh release upload ${{ github.ref_name }} $(cat uploads.txt)
           echo "uploaded!"
-          releases="$(jq --compact-output ".releases" dist-manifest.json)"
-          echo "passing releases info: ${releases}"
-          echo "releases=${releases}" >> "$GITHUB_OUTPUT"
+          echo "releases=$(jq --compact-output ".releases" dist-manifest.json)" >> "$GITHUB_OUTPUT"
   upload-homebrew-formula:
     needs: upload-global-artifacts
     runs-on: "ubuntu-20.04"

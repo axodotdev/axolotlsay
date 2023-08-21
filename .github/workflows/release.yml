@@ -178,6 +178,8 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       RELEASES: ${{ needs.upload-global-artifacts.outputs.releases }}
+      GITHUB_USER: "Misty De Méo"
+      GITHUB_EMAIL: "misty@axo.dev"
     steps:
       - uses: actions/checkout@v3
         with:
@@ -189,6 +191,9 @@ jobs:
           gh release download ${{ github.ref_name }} --dir Formula --repo ${GITHUB_REPOSITORY}
       - name: Commit formula files
         run: |
+          git config --global user.name "${GITHUB_USER}"
+          git config --global user.email "${GITHUB_EMAIL}"
+
           for release in $(echo $RELEASES | jq --compact-output '.[]'); do
             name=$(echo $release | jq .app_name --raw-output)
             version=$(echo $release | jq .app_version --raw-output)

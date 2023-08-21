@@ -137,7 +137,7 @@ jobs:
     needs: upload-local-artifacts
     runs-on: "ubuntu-20.04"
     outputs:
-      has-releases: ${{ steps.upload-global-artifacts.outputs.releases }}
+      releases: ${{ steps.upload-global-artifacts.outputs.releases }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:

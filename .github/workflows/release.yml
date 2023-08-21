@@ -199,7 +199,7 @@ jobs:
             version=$(echo $release | jq .app_version --raw-output)
 
             git add Formula/${name}.rb
-            git commit -m '${name} ${version}'
+            git commit -m "${name} ${version}"
           done
           git push
 

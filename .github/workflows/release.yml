@@ -188,7 +188,7 @@ jobs:
       # So we have access to the formula
       - name: Fetch local artifacts
         run: |
-          gh release download ${{ github.ref_name }} --dir Formula --repo ${GITHUB_REPOSITORY}
+          gh release download ${{ github.ref_name }} --dir Formula --repo ${GITHUB_REPOSITORY} --clobber
       - name: Commit formula files
         run: |
           git config --global user.name "${GITHUB_USER}"

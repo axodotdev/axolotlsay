@@ -178,7 +178,7 @@ jobs:
           repository: "mistydemeo/homebrew-cargodisttest"
           token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
       - name: Install cargo-dist
-        run: {{{ global_task.install_dist }}}
+        run: "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/cargo-dist/releases/download/v0.2.0-prerelease.2/cargo-dist-installer.sh | sh"
       # So we have access to the formula
       - name: Fetch local artifacts
         run: |

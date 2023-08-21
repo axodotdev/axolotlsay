@@ -176,8 +176,8 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       RELEASES: ${{ needs.upload-global-artifacts.outputs.releases }}
-      GITHUB_USER: "Misty De Méo"
-      GITHUB_EMAIL: "misty@axo.dev"
+      GITHUB_USER: "axo bot"
+      GITHUB_EMAIL: "admin+bot@axo.dev"
     steps:
       - uses: actions/checkout@v3
         with:

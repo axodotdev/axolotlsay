@@ -172,24 +172,19 @@ jobs:
     runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RELEASES: ${{ needs.upload-global-artifacts.outputs.releases }}
     steps:
       - uses: actions/checkout@v3
         with:
           repository: "mistydemeo/homebrew-cargodisttest"
           token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-      - name: Install cargo-dist
-        run: "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/cargo-dist/releases/download/v0.2.0-prerelease.2/cargo-dist-installer.sh | sh"
       # So we have access to the formula
       - name: Fetch local artifacts
         run: |
           gh release download ${{ github.ref_name }} --dir Formula --repo ${GITHUB_REPOSITORY}
       - name: Commit formula files
         run: |
-          cargo dist build --tag=${{ github.ref_name }} --output-format=json "--artifacts=global" > dist-manifest.json
-          echo "dist ran successfully"
-          cat dist-manifest.json
-
-          for release in $(jq --compact-output '.releases[]' dist-manifest.json); do
+          for release in $(echo $RELEASES | jq --compact-output '.[]'); do
             name=$(echo $release | jq .app_name)
             version=$(echo $release | jq .app_version)
 

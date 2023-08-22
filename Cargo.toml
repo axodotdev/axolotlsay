@@ -28,7 +28,7 @@ rust-toolchain-version = "1.67.1"
 ci = ["github"]
 # The installers to generate for each app
 installers = ["shell", "homebrew"]
-# A GitHub repo to push the Homebrew formula to
+# A GitHub repo to push Homebrew formulas to
 tap = "mistydemeo/homebrew-cargodisttest"
 # Target platforms to build apps for (Rust target-triple syntax)
 targets = ["x86_64-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-pc-windows-msvc", "aarch64-apple-darwin"]

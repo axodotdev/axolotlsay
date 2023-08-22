@@ -192,9 +192,9 @@ jobs:
           git config --global user.name "${GITHUB_USER}"
           git config --global user.email "${GITHUB_EMAIL}"
 
-          for release in $(echo $RELEASES | jq --compact-output '.[]'); do
-            name=$(echo $release | jq .app_name --raw-output)
-            version=$(echo $release | jq .app_version --raw-output)
+          for release in $(echo "$RELEASES" | jq --compact-output '.[]'); do
+            name=$(echo "$release" | jq .app_name --raw-output)
+            version=$(echo "$release" | jq .app_version --raw-output)
 
             git add Formula/${name}.rb
             git commit -m "${name} ${version}"

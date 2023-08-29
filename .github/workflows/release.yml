@@ -159,7 +159,7 @@ jobs:
       - plan
       - upload-local-artifacts
       - upload-global-artifacts
-    if: ${{ needs.plan.outputs.should_publish == 'true' }}
+    if: ${{ needs.plan.outputs.publishing == 'true' }}
     runs-on: "ubuntu-20.04"
     steps:
       - name: print tag

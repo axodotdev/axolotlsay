@@ -219,3 +219,5 @@ jobs:
           tag: ${{ needs.plan.outputs.tag }}
           prerelease: ${{ fromJson(needs.plan.outputs.val).announcement_is_prerelease }}
           artifacts: "artifacts/*"
+          allowUpdates: true
+          updateOnlyUnreleased: true

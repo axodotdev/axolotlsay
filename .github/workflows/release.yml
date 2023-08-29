@@ -170,7 +170,7 @@ jobs:
     runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      RELEASES: ${{ fromJson(needs.plan.outputs.val).releases }}
+      PLAN: ${{ needs.plan.outputs.val }}
       GITHUB_USER: "axo bot"
       GITHUB_EMAIL: "admin+bot@axo.dev"
     steps:
@@ -189,7 +189,7 @@ jobs:
           git config --global user.name "${GITHUB_USER}"
           git config --global user.email "${GITHUB_EMAIL}"
 
-          for release in $(echo "$RELEASES" | jq --compact-output '.[]'); do
+          for release in $(echo "$PLAN" | jq --compact-output '.releases[]'); do
             name=$(echo "$release" | jq .app_name --raw-output)
             version=$(echo "$release" | jq .app_version --raw-output)
 

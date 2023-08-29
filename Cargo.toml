@@ -38,3 +38,5 @@ npm-scope = "@axodotdev"
 tap = "mistydemeo/homebrew-cargodisttest"
 # Publish jobs to run in CI
 publish-jobs = ["homebrew"]
+# Whether cargo-dist should create a Github Release or use an existing draft
+create-release = false

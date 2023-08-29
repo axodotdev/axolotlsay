@@ -183,7 +183,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: artifacts
-          path: Formula
+          path: Formula/
       - name: Commit formula files
         run: |
           git config --global user.name "${GITHUB_USER}"

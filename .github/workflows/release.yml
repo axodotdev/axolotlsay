@@ -214,10 +214,8 @@ jobs:
           name: artifacts
           path: artifacts
       - name: Create Release
-        uses: ncipollo/release-action@v1
+        uses: softprops/action-gh-release@v1
         with:
           tag: ${{ needs.plan.outputs.tag }}
           prerelease: ${{ fromJson(needs.plan.outputs.val).announcement_is_prerelease }}
-          artifacts: "artifacts/*"
-          allowUpdates: true
-          updateOnlyUnreleased: true
+          files: "artifacts/*"

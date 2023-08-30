@@ -88,7 +88,7 @@ jobs:
       # Typically there will be:
       # - 1 "global" task that builds universal installers
       # - N "local" tasks that build each platform's binaries and platform-specific installers
-      matrix: ${{ fromJson(needs.plan.outputs.val).ci.github.artifacts-matrix }}
+      matrix: ${{ fromJson(needs.plan.outputs.val).ci.github.artifacts_matrix }}
     runs-on: ${{ matrix.runner }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -160,7 +160,7 @@ jobs:
       - upload-local-artifacts
       - upload-global-artifacts
     if: ${{ needs.plan.outputs.publishing == 'true' }}
-    runs-on: "ubuntu-20.04"
+    runs-on: ubuntu-latest
     steps:
       - name: print tag
         run: echo "ok we're publishing!"
@@ -217,9 +217,9 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ needs.plan.outputs.tag }}
-          prerelease: ${{ fromJson(needs.plan.outputs.val).announcement_is_prerelease }}
-          artifacts: "artifacts/*"
           allowUpdates: true
           updateOnlyUnreleased: true
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
+          prerelease: ${{ fromJson(needs.plan.outputs.val).announcement_is_prerelease }}
+          artifacts: "artifacts/*"

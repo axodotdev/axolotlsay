@@ -75,7 +75,7 @@ jobs:
   upload-local-artifacts:
     # Let the initial task tell us to not run (currently very blunt)
     needs: plan
-    if: ${{ fromJson(needs.plan.outputs.val).releases != null }}
+    if: ${{ fromJson(needs.plan.outputs.val).releases != null && (needs.plan.outputs.publishing == 'true' || fromJson(needs.plan.outputs.val).ci.github.pr_run_mode == 'upload') }}
     strategy:
       fail-fast: false
       # Target platforms/runners are computed by cargo-dist in create-release.

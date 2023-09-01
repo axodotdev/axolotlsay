@@ -5,6 +5,7 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/axodotdev/axolotlsay"
+authors = ["axo.dev"]
 
 [dependencies]
 clap = { version = "4.1.4", features = ["derive"] }

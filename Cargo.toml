@@ -1,7 +1,7 @@
 [package]
 name = "axolotlsay"
 description = "💬 a CLI for learning to distribute CLIs in rust"
-version = "0.1.36-prerelease.1"
+version = "0.1.36-prerelease.2"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/mistydemeo/cargodisttest"
@@ -40,3 +40,4 @@ tap = "mistydemeo/homebrew-cargodisttest"
 publish-jobs = ["homebrew"]
 # Whether cargo-dist should create a Github Release or use an existing draft
 create-release = false
+allow-dirty = ["ci"]

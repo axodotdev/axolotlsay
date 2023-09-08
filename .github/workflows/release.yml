@@ -58,7 +58,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=ci-plus-plus-plus cargo-dist"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=release-0-3-0-prerelease-3 cargo-dist"
       - id: plan
         run: |
           cargo dist plan ${{ !github.event.pull_request && format('--tag={0}', github.ref_name) || '' }} --output-format=json > dist-manifest.json
@@ -131,7 +131,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=ci-plus-plus-plus cargo-dist"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=release-0-3-0-prerelease-3 cargo-dist"
       # Get all the local artifacts for the global tasks to use (for e.g. checksums)
       - name: Fetch local artifacts
         uses: actions/download-artifact@v3
@@ -198,11 +198,6 @@ jobs:
             git commit -m "${name} ${version}"
           done
           git push
-
-  user-publish-jobs:
-    needs: [plan, should-publish]
-    if: ${{ !fromJson(needs.plan.outputs.val).announcement_is_prerelease || fromJson(needs.plan.outputs.val).publish_prereleases }}
-    uses: "./.github/workflows/greeter.yml"
 
   # Create a Github Release with all the results once everything is done,
   publish-release:

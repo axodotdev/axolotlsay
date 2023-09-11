@@ -38,7 +38,7 @@ npm-scope = "@axodotdev"
 tap = "mistydemeo/homebrew-cargodisttest"
 # Publish jobs to run in CI
 publish-jobs = ["homebrew"]
-user-publish-jobs = { github = ["./.github/workflows/greeter.yml"] }
+user-publish-jobs = { github = ["greeter"] }
 # Whether cargo-dist should create a Github Release or use an existing draft
 create-release = false
 # Whether to publish prereleases to package managers

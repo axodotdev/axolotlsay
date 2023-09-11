@@ -13,6 +13,11 @@ on:
 jobs:
   greeter:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PLAN: ${{ inputs.plan }}
+      GITHUB_USER: "axo bot"
+      GITHUB_EMAIL: "admin+bot@axo.dev"
     steps:
       - uses: actions/checkout@v3
         with:
@@ -29,7 +34,7 @@ jobs:
           git config --global user.name "${GITHUB_USER}"
           git config --global user.email "${GITHUB_EMAIL}"
 
-          for release in $(echo ${{ inputs.plan }} | jq --compact-output '.releases[]'); do
+          for release in $(echo "$PLAN" | jq --compact-output '.releases[]'); do
             name=$(echo "$release" | jq .app_name --raw-output)
             version=$(echo "$release" | jq .app_version --raw-output)
 

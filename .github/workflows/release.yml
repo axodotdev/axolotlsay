@@ -58,7 +58,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=ci-plus-plus-plus cargo-dist"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=system-dependencies cargo-dist"
       - id: plan
         run: |
           cargo dist plan ${{ !github.event.pull_request && format('--tag={0}', github.ref_name) || '' }} --output-format=json > dist-manifest.json
@@ -106,6 +106,8 @@ jobs:
         # in powershell.
         shell: bash
         run: |
+          ${{ matrix.packages_install }}
+
           # Actually do builds and make zips and whatnot
           cargo dist build ${{ needs.plan.outputs.tag-flag }} --output-format=json ${{ matrix.dist_args }} > dist-manifest.json
           echo "cargo dist ran successfully"
@@ -131,7 +133,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=ci-plus-plus-plus cargo-dist"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=system-dependencies cargo-dist"
       # Get all the local artifacts for the global tasks to use (for e.g. checksums)
       - name: Fetch local artifacts
         uses: actions/download-artifact@v3
@@ -198,14 +200,6 @@ jobs:
             git commit -m "${name} ${version}"
           done
           git push
-
-  user-publish-job-greeter:
-    needs: [plan, should-publish]
-    if: ${{ !fromJson(needs.plan.outputs.val).announcement_is_prerelease || fromJson(needs.plan.outputs.val).publish_prereleases }}
-    uses: ./.github/workflows/publish-greeter.yml
-    with:
-      plan: ${{ needs.plan.outputs.val }}
-    secrets: inherit
 
   # Create a Github Release with all the results once everything is done,
   publish-release:

@@ -10,8 +10,10 @@ on:
 jobs:
   greeter:
     runs-on: ubuntu-latest
+    env:
+      PLAN: ${{ inputs.plan }}
     steps:
       - name: Step 1
         run: |
           echo "Hello!"
-          echo "Plan is: ${{ inputs.plan }}"
+          echo "Plan is: ${PLAN}"

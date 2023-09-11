@@ -6,9 +6,7 @@ on:
       plan:
         required: true
         type: string
-    secrets:
-      HOMEBREW_TAP_TOKEN:
-        required: true
+    secrets: inherit
 
 jobs:
   greeter:

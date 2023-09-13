@@ -51,6 +51,7 @@ jobs:
       tag: ${{ !github.event.pull_request && github.ref_name || '' }}
       tag-flag: ${{ !github.event.pull_request && format('--tag={0}', github.ref_name) || '' }}
       publishing: ${{ !github.event.pull_request }}
+      binaries: ${{ steps.plan.outputs.binaries }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -65,6 +66,7 @@ jobs:
           echo "cargo dist plan ran successfully"
           cat dist-manifest.json
           echo "manifest=$(jq -c "." dist-manifest.json)" >> "$GITHUB_OUTPUT"
+          echo "binaries=$(jq '[first(.artifacts[]).assets[] | select(.kind | contains("executable")).name]' -c dist-manifest.json)" >> "$GITHUB_OUTPUT"
       - name: "Upload dist-manifest.json"
         uses: actions/upload-artifact@v3
         with:
@@ -92,6 +94,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      BINARIES: ${{ needs.plan.outputs.binaries }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -106,8 +109,6 @@ jobs:
         # in powershell.
         shell: bash
         run: |
-          ${{ matrix.packages_install }}
-
           # Actually do builds and make zips and whatnot
           cargo dist build ${{ needs.plan.outputs.tag-flag }} --output-format=json ${{ matrix.dist_args }} > dist-manifest.json
           echo "cargo dist ran successfully"
@@ -116,6 +117,59 @@ jobs:
           echo "paths<<EOF" >> "$GITHUB_OUTPUT"
           jq --raw-output ".artifacts[]?.path | select( . != null )" dist-manifest.json >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
+      - name: "Linkage report"
+        shell: bash
+        if: contains(${{ matrix.runner }}, "macos")
+        run: |
+          # Obviously wrong, fix later
+          target=./target/${{ needs.plan.outputs.tag-flag }}/$(echo "${BINARIES}" | jq .[0] --raw)
+
+          frameworks=()
+          system=()
+          homebrew=()
+          public_unbrewed=()
+          other=()
+
+          while IFS= read -r line; do
+          library=$(echo $line | awk '{ print $1 }')
+          case $library in
+              /opt/homebrew/*)
+              homebrew+=($library)
+              ;;
+              /usr/lib/*|/lib/*)
+              system+=($library)
+              ;;
+              /usr/local/*)
+              if [[ "$(realpath $library)" =~ /usr/local/Cellar ]]; then
+                  homebrew+=($library)
+              else
+                  public_unbrewed+=$(library)
+              fi
+              ;;
+              /System/Library/Frameworks/*|/Library/Frameworks/*)
+              frameworks+=($library)
+              ;;
+              *)
+              other+=($library)
+              ;;
+          esac
+          done < <(otool -L $target | tail -n +2)
+
+          echo "System: ${system[@]}"
+          echo "Homebrew: ${homebrew[@]}"
+          echo "Public non-Homebrew: ${public_unbrewed[@]}"
+          echo "Frameworks: ${frameworks[@]}"
+          echo "Other: ${other[@]}"
+
+          system_object=$(jq --null-input '{ system: $ARGS.positional }'  --args "${system[@]}")
+          homebrew_object=$(jq --null-input '{ homebrew: $ARGS.positional }'  --args "${homebrew[@]}")
+          public_unbrewed_object=$(jq --null-input '{ public_unbrewed: $ARGS.positional }'  --args "${public_unbrewed[@]}")
+          frameworks_object=$(jq --null-input '{ frameworks: $ARGS.positional }'  --args "${frameworks[@]}")
+          other_object=$(jq --null-input '{ other: $ARGS.positional }'  --args "${other[@]}")
+          object=$(echo "${system_object}" "${homebrew_object}" "${public_unbrewed_object}" "${frameworks_object}" "${other_object}" | jq --slurp 'reduce .[] as $item ({}; . * $item)')
+
+          echo $object
+
       - name: "Upload artifacts"
         uses: actions/upload-artifact@v3
         with:

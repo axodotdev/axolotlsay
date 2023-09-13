@@ -1,7 +1,7 @@
 [package]
 name = "axolotlsay"
 description = "💬 a CLI for learning to distribute CLIs in rust"
-version = "0.1.54"
+version = "0.1.55"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/mistydemeo/cargodisttest"
@@ -43,3 +43,4 @@ publish-jobs = ["homebrew"]
 create-release = false
 # Whether to publish prereleases to package managers
 publish-prereleases = true
+allow-dirty = ["ci"]

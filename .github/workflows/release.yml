@@ -122,7 +122,7 @@ jobs:
         if: contains(${{ matrix.runner }}, "macos")
         run: |
           # Obviously wrong, fix later
-          target=./target/$(echo ${{ matrix.dist_args }} | sed 's,--target=,,')/$(echo "${BINARIES}" | jq .[0] --raw-output)
+          target=./target/$(echo ${{ matrix.dist_args }} | sed 's,--artifacts=.* --target=,,')/$(echo "${BINARIES}" | jq .[0] --raw-output)
 
           frameworks=()
           system=()

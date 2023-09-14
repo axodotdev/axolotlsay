@@ -51,7 +51,6 @@ jobs:
       tag: ${{ !github.event.pull_request && github.ref_name || '' }}
       tag-flag: ${{ !github.event.pull_request && format('--tag={0}', github.ref_name) || '' }}
       publishing: ${{ !github.event.pull_request }}
-      binaries: ${{ steps.plan.outputs.binaries }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -59,14 +58,13 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=ci-plus-plus-plus cargo-dist"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=system-dependencies cargo-dist"
       - id: plan
         run: |
           cargo dist plan ${{ !github.event.pull_request && format('--tag={0}', github.ref_name) || '' }} --output-format=json > dist-manifest.json
           echo "cargo dist plan ran successfully"
           cat dist-manifest.json
           echo "manifest=$(jq -c "." dist-manifest.json)" >> "$GITHUB_OUTPUT"
-          echo "binaries=$(jq '[first(.artifacts[]).assets[] | select(.kind | contains("executable")).name]' -c dist-manifest.json)" >> "$GITHUB_OUTPUT"
       - name: "Upload dist-manifest.json"
         uses: actions/upload-artifact@v3
         with:
@@ -94,7 +92,6 @@ jobs:
     runs-on: ${{ matrix.runner }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      BINARIES: ${{ needs.plan.outputs.binaries }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -109,20 +106,21 @@ jobs:
         # in powershell.
         shell: bash
         run: |
+          ${{ matrix.packages_install }}
+
+          CARGO="cargo"
+          if [[ -f "Brewfile" ]]; then
+            CARGO="brew bundle exec -- cargo
+          fi
+
           # Actually do builds and make zips and whatnot
-          cargo dist build ${{ needs.plan.outputs.tag-flag }} --output-format=json ${{ matrix.dist_args }} > dist-manifest.json
+          $CARGO dist build ${{ needs.plan.outputs.tag-flag }} --output-format=json ${{ matrix.dist_args }} > dist-manifest.json
           echo "cargo dist ran successfully"
 
           # Parse out what we just built and upload it to the Github Release™
           echo "paths<<EOF" >> "$GITHUB_OUTPUT"
           jq --raw-output ".artifacts[]?.path | select( . != null )" dist-manifest.json >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
-      - name: "Linkage report"
-        shell: bash
-        if: contains(${{ matrix.runner }}, "macos")
-        run: |
-          cargo dist linkage ${{ matrix.dist_args }} --print-output --print-json
-
       - name: "Upload artifacts"
         uses: actions/upload-artifact@v3
         with:
@@ -140,7 +138,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=ci-plus-plus-plus cargo-dist"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=system-dependencies cargo-dist"
       # Get all the local artifacts for the global tasks to use (for e.g. checksums)
       - name: Fetch local artifacts
         uses: actions/download-artifact@v3

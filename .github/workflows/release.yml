@@ -59,7 +59,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/cargo-dist/releases/download/v0.3.0-prerelease.4/cargo-dist-installer.sh | sh"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=ci-plus-plus-plus cargo-dist"
       - id: plan
         run: |
           cargo dist plan ${{ !github.event.pull_request && format('--tag={0}', github.ref_name) || '' }} --output-format=json > dist-manifest.json
@@ -121,54 +121,7 @@ jobs:
         shell: bash
         if: contains(${{ matrix.runner }}, "macos")
         run: |
-          # Obviously wrong, fix later
-          target=./target/$(echo ${{ matrix.dist_args }} | sed 's,--artifacts=.* --target=,,')/dist/$(echo "${BINARIES}" | jq .[0] --raw-output)
-
-          frameworks=()
-          system=()
-          homebrew=()
-          public_unbrewed=()
-          other=()
-
-          while IFS= read -r line; do
-          library=$(echo $line | awk '{ print $1 }')
-          case $library in
-              /opt/homebrew/*)
-              homebrew+=($library)
-              ;;
-              /usr/lib/*|/lib/*)
-              system+=($library)
-              ;;
-              /usr/local/*)
-              if [[ "$(realpath $library)" =~ /usr/local/Cellar ]]; then
-                  homebrew+=($library)
-              else
-                  public_unbrewed+=$(library)
-              fi
-              ;;
-              /System/Library/Frameworks/*|/Library/Frameworks/*)
-              frameworks+=($library)
-              ;;
-              *)
-              other+=($library)
-              ;;
-          esac
-          done < <(otool -L $target | tail -n +2)
-
-          echo "System: ${system[@]}"
-          echo "Homebrew: ${homebrew[@]}"
-          echo "Public non-Homebrew: ${public_unbrewed[@]}"
-          echo "Frameworks: ${frameworks[@]}"
-          echo "Other: ${other[@]}"
-
-          system_object=$(jq --null-input '{ system: $ARGS.positional }'  --args "${system[@]}")
-          homebrew_object=$(jq --null-input '{ homebrew: $ARGS.positional }'  --args "${homebrew[@]}")
-          public_unbrewed_object=$(jq --null-input '{ public_unbrewed: $ARGS.positional }'  --args "${public_unbrewed[@]}")
-          frameworks_object=$(jq --null-input '{ frameworks: $ARGS.positional }'  --args "${frameworks[@]}")
-          other_object=$(jq --null-input '{ other: $ARGS.positional }'  --args "${other[@]}")
-          object=$(echo "${system_object}" "${homebrew_object}" "${public_unbrewed_object}" "${frameworks_object}" "${other_object}" | jq --slurp 'reduce .[] as $item ({}; . * $item)')
-
-          echo $object
+          cargo dist linkage ${{ matrix.dist_args }} --print-output --print-json
 
       - name: "Upload artifacts"
         uses: actions/upload-artifact@v3
@@ -187,7 +140,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/cargo-dist/releases/download/v0.3.0-prerelease.4/cargo-dist-installer.sh | sh"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=ci-plus-plus-plus cargo-dist"
       # Get all the local artifacts for the global tasks to use (for e.g. checksums)
       - name: Fetch local artifacts
         uses: actions/download-artifact@v3

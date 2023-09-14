@@ -110,7 +110,7 @@ jobs:
 
           CARGO="cargo"
           if [[ -f "Brewfile" ]]; then
-            CARGO="brew bundle exec -- cargo
+            CARGO="brew bundle exec -- cargo"
           fi
 
           # Actually do builds and make zips and whatnot

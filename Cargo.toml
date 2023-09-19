@@ -1,7 +1,7 @@
 [package]
 name = "axolotlsay"
 description = "💬 a CLI for learning to distribute CLIs in rust"
-version = "0.1.68"
+version = "0.1.69"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/mistydemeo/cargodisttest"
@@ -22,7 +22,7 @@ lto = "thin"
 # Config for 'cargo dist'
 [workspace.metadata.dist]
 # The preferred cargo-dist version to use in CI (Cargo.toml SemVer syntax)
-cargo-dist-version = "0.3.0-github-system-dependencies"
+cargo-dist-version = "0.3.0-github-linkage-report-subcommand"
 # CI backends to support (see 'cargo dist generate-ci')
 ci = ["github"]
 # The installers to generate for each app
@@ -44,5 +44,3 @@ publish-jobs = ["homebrew"]
 create-release = false
 # Whether to publish prereleases to package managers
 publish-prereleases = true
-# Skip checking whether the specified configuration files are up to date
-allow-dirty = ["ci"]

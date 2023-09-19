@@ -1,14 +1,13 @@
 [package]
 name = "axolotlsay"
 description = "💬 a CLI for learning to distribute CLIs in rust"
-version = "0.1.71"
+version = "0.1.72"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/mistydemeo/cargodisttest"
 
 [dependencies]
 clap = { version = "4.1.4", features = ["derive"] }
-cue = "2.0.0"
 unicode-width = "0.1.10"
 
 [dev-dependencies]
@@ -22,7 +21,7 @@ lto = "thin"
 # Config for 'cargo dist'
 [workspace.metadata.dist]
 # The preferred cargo-dist version to use in CI (Cargo.toml SemVer syntax)
-cargo-dist-version = "0.3.0-github-linkage-report-subcommand"
+cargo-dist-version = "0.3.0-github-system-dependencies"
 # CI backends to support (see 'cargo dist generate-ci')
 ci = ["github"]
 # The installers to generate for each app
@@ -37,7 +36,7 @@ unix-archive = ".tar.gz"
 npm-scope = "@axodotdev"
 # A GitHub repo to push Homebrew formulas to
 tap = "mistydemeo/homebrew-cargodisttest"
-system-dependencies = { homebrew = ["libcue"], apt = ["libcue-dev"] }
+system-dependencies = { homebrew = ["cmake"], apt = ["cmake"], chocolatey = ["cmake"] }
 # Publish jobs to run in CI
 publish-jobs = ["homebrew"]
 # Whether cargo-dist should create a Github Release or use an existing draft

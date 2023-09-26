@@ -1,7 +1,7 @@
 [package]
 name = "axolotlsay"
 description = "💬 a CLI for learning to distribute CLIs in rust"
-version = "0.1.81"
+version = "0.1.82"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/mistydemeo/cargodisttest"
@@ -51,4 +51,8 @@ libcue = { version = "2.2.1" }
 
 [workspace.metadata.dist.dependencies.apt]
 cmake = '*'
-libcue-dev = { version = "2.2.1-3build3" }
+libcue-dev = { version = "2.2.1-2" }
+
+[workspace.metadata.dist.dependencies.chocolatey]
+git = '*'
+cmake = '3.27.6'

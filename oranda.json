@@ -13,10 +13,11 @@
       "cargo_dist": true,
       "package_managers": {
         "preferred": {
-          "npx": "npx @axodotdev/axolotlsay"
+          "npm": "npm install @axodotdev/axolotlsay --save-dev"
         },
         "additional": {
-          "crates.io": "cargo install axolotlsay --locked --profile=dist",
+          "cargo": "cargo install axolotlsay --locked",
+          "npx": "npx @axodotdev/axolotlsay",
           "binstall": "cargo binstall axolotlsay"
         }
       }

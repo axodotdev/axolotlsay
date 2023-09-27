@@ -20,8 +20,7 @@
           "npx": "npx @axodotdev/axolotlsay",
           "binstall": "cargo binstall axolotlsay"
         }
-      },
-      "hidden": ["sha256"]
+      }
     }
   },
   "marketing": {

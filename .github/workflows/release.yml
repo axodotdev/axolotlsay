@@ -103,11 +103,16 @@ jobs:
         run: |
           ${{ matrix.packages_install }}
       - name: Build artifacts
-        env:
-          CARGO: "${{ hashFiles('Brewfile') == '' && 'cargo' || 'brew bundle exec -- cargo' }}"
+        if: ${{ !startsWith(matrix.runner, "macos") }}
         run: |
           # Actually do builds and make zips and whatnot
-          $CARGO dist build ${{ needs.plan.outputs.tag-flag }} --output-format=json ${{ matrix.dist_args }} > dist-manifest.json
+          cargo dist build ${{ needs.plan.outputs.tag-flag }} --output-format=json ${{ matrix.dist_args }} > dist-manifest.json
+          echo "cargo dist ran successfully"
+      - name: Build artifacts (using Brewfile)
+        if: ${{ startsWith(matrix.runner, "macos") && hashFiles('Brewfile') != '' }}
+        run: |
+          # Actually do builds and make zips and whatnot
+          brew bundle exec -- cargo dist build ${{ needs.plan.outputs.tag-flag }} --output-format=json ${{ matrix.dist_args }} > dist-manifest.json
           echo "cargo dist ran successfully"
       - id: cargo-dist
         name: Post-build

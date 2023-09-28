@@ -103,12 +103,9 @@ jobs:
         run: |
           ${{ matrix.packages_install }}
       - name: Build artifacts
+        env:
+          CARGO: "${{ hashFiles('Brewfile') == '' && 'cargo' || 'brew bundle exec -- cargo' }}"
         run: |
-          CARGO="cargo"
-          if [[ -f "Brewfile" ]]; then
-            CARGO="brew bundle exec -- cargo"
-          fi
-
           # Actually do builds and make zips and whatnot
           $CARGO dist build ${{ needs.plan.outputs.tag-flag }} --output-format=json ${{ matrix.dist_args }} > dist-manifest.json
           echo "cargo dist ran successfully"

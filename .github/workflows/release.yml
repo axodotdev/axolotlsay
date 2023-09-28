@@ -103,7 +103,7 @@ jobs:
         run: |
           ${{ matrix.packages_install }}
       - name: Build artifacts
-        if: ${{ !startsWith(matrix.runner, "macos") }}
+        if: ${{ !startsWith(matrix.runner, 'macos') }}
         run: |
           # Actually do builds and make zips and whatnot
           cargo dist build ${{ needs.plan.outputs.tag-flag }} --output-format=json ${{ matrix.dist_args }} > dist-manifest.json

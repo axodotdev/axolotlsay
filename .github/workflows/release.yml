@@ -127,7 +127,8 @@ jobs:
           echo "EOF" >> "$GITHUB_OUTPUT"
       - name: "Linkage report"
         run: |
-          cargo dist linkage ${{ matrix.dist_args }} --print-output
+          jq .linkage dist-manifest.json > /tmp/linkage.json
+          cargo dist linkage ${{ matrix.dist_args }} --from-json=/tmp/linkage.json --print-output
       - name: "Upload artifacts"
         uses: actions/upload-artifact@v3
         with:

@@ -92,7 +92,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      BUILD_MANIFEST_NAME: ${{ join(fromJson(matrix.targets), '-') }}-dist-manifest.json
+      BUILD_MANIFEST_NAME: ${{ join(matrix.targets, '-') }}-dist-manifest.json
     steps:
       - uses: actions/checkout@v4
         with:

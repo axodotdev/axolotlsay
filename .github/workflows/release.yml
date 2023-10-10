@@ -58,7 +58,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=use-linkage-data cargo-dist"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=use-linkage-data-alt cargo-dist"
       - id: plan
         run: |
           cargo dist plan ${{ !github.event.pull_request && format('--tag={0}', github.ref_name) || '' }} --output-format=json > dist-manifest.json
@@ -92,7 +92,6 @@ jobs:
     runs-on: ${{ matrix.runner }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      BUILD_MANIFEST_NAME: ${{ join(matrix.targets, '-') }}-dist-manifest.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -126,15 +125,11 @@ jobs:
           echo "paths<<EOF" >> "$GITHUB_OUTPUT"
           jq --raw-output ".artifacts[]?.path | select( . != null )" dist-manifest.json >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
-
-          cp dist-manifest.json "$BUILD_MANIFEST_NAME"
       - name: "Upload artifacts"
         uses: actions/upload-artifact@v3
         with:
           name: artifacts
-          path: |
-            ${{ steps.cargo-dist.outputs.paths }}
-            ${{ env.BUILD_MANIFEST_NAME }}
+          path: ${{ steps.cargo-dist.outputs.paths }}
 
   # Build and package all the platform-agnostic(ish) things
   upload-global-artifacts:
@@ -147,7 +142,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=use-linkage-data cargo-dist"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=use-linkage-data-alt cargo-dist"
       # Get all the local artifacts for the global tasks to use (for e.g. checksums)
       - name: Fetch local artifacts
         uses: actions/download-artifact@v3

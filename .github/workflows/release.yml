@@ -153,9 +153,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: artifacts
-          path: |
-            target/distrib/
-            *-dist-manifest.json
+          path: target/distrib/
       - id: cargo-dist
         shell: bash
         run: |

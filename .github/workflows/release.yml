@@ -238,7 +238,7 @@ jobs:
       - name: Cleanup
         run: |
           # Remove the granular manifests
-          rm target/distrib/*-dist-manifest.json
+          rm artifacts/*-dist-manifest.json
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:

@@ -92,7 +92,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      BUILD_MANIFEST_NAME: ${{ join(matrix.targets, '-') }}-dist-manifest.json
+      BUILD_MANIFEST_NAME: target/distrib/${{ join(matrix.targets, '-') }}-dist-manifest.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -132,13 +132,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: artifacts
-          path: |
+          path: \
             ${{ steps.cargo-dist.outputs.paths }}
-      - name: "Upload manifest"
-        uses: actions/upload-artifact@v3
-        with:
-          name: artifacts
-          path: |
             ${{ env.BUILD_MANIFEST_NAME }}
 
   # Build and package all the platform-agnostic(ish) things

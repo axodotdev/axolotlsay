@@ -68,11 +68,10 @@ dependencies = [
 
 [[package]]
 name = "axolotlsay"
-version = "0.2.27"
+version = "0.2.28"
 dependencies = [
  "assert_cmd",
  "clap",
- "cue",
  "unicode-width",
 ]
 
@@ -148,25 +147,6 @@ name = "colorchoice"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "acbf1af155f9b9ef647e42cdc158db4b64a1b61f743629225fde6f3e0be2a7c7"
-
-[[package]]
-name = "cue"
-version = "2.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa8bcf4c6736cccc4eaeb108973e6457cb5c4d6393e29cdf61158cee51c0d4af"
-dependencies = [
- "cue-sys",
- "libc",
-]
-
-[[package]]
-name = "cue-sys"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7eb6bf9ed3f73d97b215e5d9c76293095b1fccb1ffd68a8926a8103d11f11440"
-dependencies = [
- "libc",
-]
 
 [[package]]
 name = "difflib"

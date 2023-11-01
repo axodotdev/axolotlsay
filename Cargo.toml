@@ -1,7 +1,7 @@
 [package]
 name = "axolotlsay"
 description = "💬 a CLI for learning to distribute CLIs in rust"
-version = "0.2.46"
+version = "0.2.47"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/mistydemeo/cargodisttest"
@@ -28,7 +28,7 @@ ci = ["github"]
 # The installers to generate for each app
 installers = ["shell", "homebrew"]
 # Target platforms to build apps for (Rust target-triple syntax)
-targets = ["x86_64-unknown-linux-gnu", "aarch64-apple-darwin", "x86_64-apple-darwin", "x86_64-unknown-linux-musl"]
+targets = ["x86_64-unknown-linux-gnu", "x86_64-apple-darwin"]
 # The archive format to use for windows builds (defaults .zip)
 windows-archive = ".tar.gz"
 # The archive format to use for non-windows builds (defaults .tar.xz)
@@ -47,12 +47,12 @@ publish-prereleases = true
 pr-run-mode = "plan"
 
 [workspace.metadata.dist.dependencies.homebrew]
-cmake = { targets = ["x86_64-apple-darwin"] }
+cmake = '*'
 libcue = { version = "2.2.1", targets = ["x86_64-apple-darwin"] }
 
 [workspace.metadata.dist.dependencies.apt]
 cmake = '*'
-libcue-dev = { version = "2.2.1-2" }
+libcue-dev = '*'
 
 [workspace.metadata.dist.dependencies.chocolatey]
 lftp = '*'

@@ -1,12 +1,13 @@
 [package]
 name = "axolotlsay"
 description = "💬 a CLI for learning to distribute CLIs in rust"
-version = "0.2.45"
+version = "0.2.46"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/mistydemeo/cargodisttest"
 
 [dependencies]
+cue = "2.0.0"
 clap = { version = "4.1.4", features = ["derive"] }
 unicode-width = "0.1.10"
 
@@ -21,7 +22,7 @@ lto = "thin"
 # Config for 'cargo dist'
 [workspace.metadata.dist]
 # The preferred cargo-dist version to use in CI (Cargo.toml SemVer syntax)
-cargo-dist-version = "0.4.0-github-musl-force-static"
+cargo-dist-version = "0.4.0-github-refactory"
 # CI backends to support
 ci = ["github"]
 # The installers to generate for each app

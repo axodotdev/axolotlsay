@@ -1,7 +1,7 @@
 [package]
 name = "axolotlsay"
 description = "💬 a CLI for learning to distribute CLIs in rust"
-version = "0.2.60"
+version = "0.2.61"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/mistydemeo/cargodisttest"
@@ -37,8 +37,8 @@ unix-archive = ".tar.gz"
 npm-scope = "@axodotdev"
 # A GitHub repo to push Homebrew formulas to
 tap = "mistydemeo/homebrew-cargodisttest"
-# Plan jobs to run in CI
-plan-jobs = ["./plan-greeter"]
+# Local artifacts jobs to run in CI
+local-artifacts-jobs = ["./local-build-greeter"]
 # Whether to publish prereleases to package managers
 publish-prereleases = false
 # Publish jobs to run in CI

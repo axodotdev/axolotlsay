@@ -80,10 +80,6 @@ jobs:
           name: artifacts
           path: dist-manifest.json
 
-  custom-plan-greeter:
-    uses: ./.github/workflows/plan-greeter.yml
-    secrets: inherit
-
   # Build and packages all the platform-specific things
   build-local-artifacts:
     name: build-local-artifacts (${{ join(matrix.targets, ', ') }})
@@ -148,6 +144,14 @@ jobs:
           path: |
             ${{ steps.cargo-dist.outputs.paths }}
             ${{ env.BUILD_MANIFEST_NAME }}
+
+  custom-local-build-greeter:
+    needs:
+      - plan
+    uses: ./.github/workflows/local-build-greeter.yml
+    with:
+      plan: ${{ needs.plan.outputs.val }}
+    secrets: inherit
 
   # Build and package all the platform-agnostic(ish) things
   build-global-artifacts:

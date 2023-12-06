@@ -1,0 +1,12 @@
+name: Greeter
+
+on:
+  workflow_call:
+
+jobs:
+  greeter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1
+        run: |
+          echo "Hello!"

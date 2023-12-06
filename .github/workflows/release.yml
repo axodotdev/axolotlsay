@@ -59,7 +59,10 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=add-source-tarballs cargo-dist"
+        # we specify bash to get pipefail; it guards against the `curl` command
+        # failing. otherwise `sh` won't catch that `curl` returned non-0
+        shell: bash
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=custom-job-hooks cargo-dist"
       # sure would be cool if github gave us proper conditionals...
       # so here's a doubly-nested ternary-via-truthiness to try to provide the best possible
       # functionality based on whether this is a pull_request, and whether it's from a fork.
@@ -76,6 +79,10 @@ jobs:
         with:
           name: artifacts
           path: dist-manifest.json
+
+  custom-plan-greeter:
+    uses: ./.github/workflows/plan-greeter.yml
+    secrets: inherit
 
   # Build and packages all the platform-specific things
   build-local-artifacts:
@@ -156,7 +163,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=add-source-tarballs cargo-dist"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=custom-job-hooks cargo-dist"
       # Get all the local artifacts for the global tasks to use (for e.g. checksums)
       - name: Fetch local artifacts
         uses: actions/download-artifact@v3
@@ -200,7 +207,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=add-source-tarballs cargo-dist"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=custom-job-hooks cargo-dist"
       # Fetch artifacts from scratch-storage
       - name: Fetch artifacts
         uses: actions/download-artifact@v3

@@ -145,14 +145,6 @@ jobs:
             ${{ steps.cargo-dist.outputs.paths }}
             ${{ env.BUILD_MANIFEST_NAME }}
 
-  custom-local-build-greeter:
-    needs:
-      - plan
-    uses: ./.github/workflows/local-build-greeter.yml
-    with:
-      plan: ${{ needs.plan.outputs.val }}
-    secrets: inherit
-
   # Build and package all the platform-agnostic(ish) things
   build-global-artifacts:
     needs:
@@ -193,6 +185,15 @@ jobs:
           path: |
             ${{ steps.cargo-dist.outputs.paths }}
             ${{ env.BUILD_MANIFEST_NAME }}
+
+  custom-local-build-greeter:
+    needs:
+      - plan
+      - build-local-artifacts
+    uses: ./.github/workflows/local-build-greeter.yml
+    with:
+      plan: ${{ needs.plan.outputs.val }}
+    secrets: inherit
   # Determines if we should publish/announce
   host:
     needs:

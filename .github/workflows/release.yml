@@ -146,20 +146,11 @@ jobs:
             ${{ steps.cargo-dist.outputs.paths }}
             ${{ env.BUILD_MANIFEST_NAME }}
 
-  custom-local-build-greeter:
-    needs:
-      - plan
-    uses: ./.github/workflows/local-build-greeter.yml
-    with:
-      plan: ${{ needs.plan.outputs.val }}
-    secrets: inherit
-
   # Build and package all the platform-agnostic(ish) things
   build-global-artifacts:
     needs:
       - plan
       - build-local-artifacts
-      - custom-local-build-greeter
     runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -195,12 +186,22 @@ jobs:
           path: |
             ${{ steps.cargo-dist.outputs.paths }}
             ${{ env.BUILD_MANIFEST_NAME }}
+
+  custom-global-build-greeter:
+    needs:
+      - plan
+      - build-local-artifacts
+    uses: ./.github/workflows/global-build-greeter.yml
+    with:
+      plan: ${{ needs.plan.outputs.val }}
+    secrets: inherit
   # Determines if we should publish/announce
   host:
     needs:
       - plan
       - build-local-artifacts
       - build-global-artifacts
+      - custom-global-build-greeter
     # Only run if we're "publishing", and only if local and global didn't fail (skipped is fine)
     if: ${{ always() && needs.plan.outputs.publishing == 'true' && (needs.build-global-artifacts.result == 'skipped' || needs.build-global-artifacts.result == 'success') && (needs.build-local-artifacts.result == 'skipped' || needs.build-local-artifacts.result == 'success') }}
     env:

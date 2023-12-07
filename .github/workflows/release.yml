@@ -80,12 +80,17 @@ jobs:
           name: artifacts
           path: dist-manifest.json
 
+  custom-plan-greeter:
+    uses: ./.github/workflows/plan-greeter.yml
+    secrets: inherit
+
   # Build and packages all the platform-specific things
   build-local-artifacts:
     name: build-local-artifacts (${{ join(matrix.targets, ', ') }})
     # Let the initial task tell us to not run (currently very blunt)
     needs:
       - plan
+      - custom-plan-greeter
     if: ${{ fromJson(needs.plan.outputs.val).ci.github.artifacts_matrix.include != null && (needs.plan.outputs.publishing == 'true' || fromJson(needs.plan.outputs.val).ci.github.pr_run_mode == 'upload') }}
     strategy:
       fail-fast: false
@@ -146,11 +151,21 @@ jobs:
             ${{ steps.cargo-dist.outputs.paths }}
             ${{ env.BUILD_MANIFEST_NAME }}
 
+  custom-local-build-greeter:
+    needs:
+      - plan
+      - custom-plan-greeter
+    uses: ./.github/workflows/local-build-greeter.yml
+    with:
+      plan: ${{ needs.plan.outputs.val }}
+    secrets: inherit
+
   # Build and package all the platform-agnostic(ish) things
   build-global-artifacts:
     needs:
       - plan
       - build-local-artifacts
+      - custom-local-build-greeter
     runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -191,6 +206,7 @@ jobs:
     needs:
       - plan
       - build-local-artifacts
+      - custom-local-build-greeter
     uses: ./.github/workflows/global-build-greeter.yml
     with:
       plan: ${{ needs.plan.outputs.val }}
@@ -235,10 +251,22 @@ jobs:
           name: artifacts
           path: dist-manifest.json
 
+  custom-host-greeter:
+    needs:
+      - plan
+      - build-local-artifacts
+      - build-global-artifacts
+      - custom-global-build-greeter
+    uses: ./.github/workflows/host-greeter.yml
+    with:
+      plan: ${{ needs.plan.outputs.val }}
+    secrets: inherit
+
   publish-homebrew-formula:
     needs:
       - plan
       - host
+      - custom-host-greeter
     runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -271,16 +299,29 @@ jobs:
           done
           git push
 
+  custom-publish-greeter:
+    needs:
+      - plan
+      - host
+      - custom-host-greeter
+    if: ${{ !fromJson(needs.plan.outputs.val).announcement_is_prerelease || fromJson(needs.plan.outputs.val).publish_prereleases }}
+    uses: ./.github/workflows/publish-greeter.yml
+    with:
+      plan: ${{ needs.plan.outputs.val }}
+    secrets: inherit
+
   # Create a Github Release while uploading all files to it
   announce:
     needs:
       - plan
       - host
       - publish-homebrew-formula
+      - custom-publish-greeter
+      - custom-host-greeter
     # use "always() && ..." to allow us to wait for all publish jobs while
     # still allowing individual publish jobs to skip themselves (for prereleases).
     # "host" however must run to completion, no skipping allowed!
-    if: ${{ always() && needs.host.result == 'success' && (needs.publish-homebrew-formula.result == 'skipped' || needs.publish-homebrew-formula.result == 'success') }}
+    if: ${{ always() && needs.host.result == 'success' && (needs.publish-homebrew-formula.result == 'skipped' || needs.publish-homebrew-formula.result == 'success') && (needs.custom-publish-greeter.result == 'skipped' || needs.custom-publish-greeter.result == 'success') }}
     runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

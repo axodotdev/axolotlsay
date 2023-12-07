@@ -1,0 +1,19 @@
+name: Greeter
+
+on:
+  workflow_call:
+    inputs:
+      plan:
+        required: true
+        type: string
+
+jobs:
+  greeter:
+    runs-on: ubuntu-latest
+    env:
+      PLAN: ${{ inputs.plan }}
+    steps:
+      - name: Step 1
+        run: |
+          echo "Hello!"
+          echo "Plan is: ${PLAN}"

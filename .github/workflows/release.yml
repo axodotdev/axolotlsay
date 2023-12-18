@@ -6,6 +6,7 @@
 # * checks for a Git Tag that looks like a release
 # * builds artifacts with cargo-dist (archives, installers, hashes)
 # * uploads those artifacts to temporary workflow zip
+# * on success, uploads the artifacts to Axo Releases and makes an Announcement
 # * on success, uploads the artifacts to a Github Release
 #
 # Note that the Github Release will be created with a generated
@@ -54,6 +55,7 @@ jobs:
       publishing: ${{ !github.event.pull_request }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      AXO_RELEASES_TOKEN: ${{ secrets.AXO_RELEASES_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,7 +64,7 @@ jobs:
         # we specify bash to get pipefail; it guards against the `curl` command
         # failing. otherwise `sh` won't catch that `curl` returned non-0
         shell: bash
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=main cargo-dist"
+        run: "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/cargo-dist/releases/download/v0.6.0-prerelease.4/cargo-dist-installer.sh | sh"
       # sure would be cool if github gave us proper conditionals...
       # so here's a doubly-nested ternary-via-truthiness to try to provide the best possible
       # functionality based on whether this is a pull_request, and whether it's from a fork.
@@ -80,17 +82,11 @@ jobs:
           name: artifacts
           path: dist-manifest.json
 
-  custom-plan-greeter:
-    uses: ./.github/workflows/plan-greeter.yml
-    secrets: inherit
-
   # Build and packages all the platform-specific things
   build-local-artifacts:
     name: build-local-artifacts (${{ join(matrix.targets, ', ') }})
     # Let the initial task tell us to not run (currently very blunt)
-    needs:
-      - plan
-      - custom-plan-greeter
+    needs: plan
     if: ${{ fromJson(needs.plan.outputs.val).ci.github.artifacts_matrix.include != null && (needs.plan.outputs.publishing == 'true' || fromJson(needs.plan.outputs.val).ci.github.pr_run_mode == 'upload') }}
     strategy:
       fail-fast: false
@@ -151,21 +147,11 @@ jobs:
             ${{ steps.cargo-dist.outputs.paths }}
             ${{ env.BUILD_MANIFEST_NAME }}
 
-  custom-local-build-greeter:
-    needs:
-      - plan
-      - custom-plan-greeter
-    uses: ./.github/workflows/local-build-greeter.yml
-    with:
-      plan: ${{ needs.plan.outputs.val }}
-    secrets: inherit
-
   # Build and package all the platform-agnostic(ish) things
   build-global-artifacts:
     needs:
       - plan
       - build-local-artifacts
-      - custom-local-build-greeter
     runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -175,7 +161,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=main cargo-dist"
+        run: "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/cargo-dist/releases/download/v0.6.0-prerelease.4/cargo-dist-installer.sh | sh"
       # Get all the local artifacts for the global tasks to use (for e.g. checksums)
       - name: Fetch local artifacts
         uses: actions/download-artifact@v3
@@ -201,27 +187,26 @@ jobs:
           path: |
             ${{ steps.cargo-dist.outputs.paths }}
             ${{ env.BUILD_MANIFEST_NAME }}
-
-  custom-global-build-greeter:
-    needs:
-      - plan
-      - build-local-artifacts
-      - custom-local-build-greeter
-    uses: ./.github/workflows/global-build-greeter.yml
-    with:
-      plan: ${{ needs.plan.outputs.val }}
-    secrets: inherit
-  # Determines if we should publish/announce
+  # Uploads the artifacts to Axo Releases and tentatively creates Releases for them.
+  # This makes perma URLs like /v1.0.0/ live for subsequent publish steps to use, but
+  # leaves them "disconnected" from the release history (for the purposes of
+  # "list the releases" or "give me the latest releases").
+  #
+  # If all the subsequent "publish" steps succeed, the "announce" job will "connect"
+  # the releases and concepts like "latest" will be updated. Otherwise you're hopefully
+  # in a decent position to roll back the release without anyone noticing it!
+  # This is imperfect with things like "publish to crates.io" being irreversible, but
+  # at worst you're in a better position to yank the version with minimum disruption.
   host:
     needs:
       - plan
       - build-local-artifacts
       - build-global-artifacts
-      - custom-global-build-greeter
     # Only run if we're "publishing", and only if local and global didn't fail (skipped is fine)
     if: ${{ always() && needs.plan.outputs.publishing == 'true' && (needs.build-global-artifacts.result == 'skipped' || needs.build-global-artifacts.result == 'success') && (needs.build-local-artifacts.result == 'skipped' || needs.build-local-artifacts.result == 'success') }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      AXO_RELEASES_TOKEN: ${{ secrets.AXO_RELEASES_TOKEN }}
     runs-on: "ubuntu-20.04"
     outputs:
       val: ${{ steps.host.outputs.manifest }}
@@ -230,13 +215,14 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=main cargo-dist"
+        run: "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/cargo-dist/releases/download/v0.6.0-prerelease.4/cargo-dist-installer.sh | sh"
       # Fetch artifacts from scratch-storage
       - name: Fetch artifacts
         uses: actions/download-artifact@v3
         with:
           name: artifacts
           path: target/distrib/
+      # Upload files to Axo Releases and create the Releases
       # This is a harmless no-op for Github Releases, hosting for that happens in "announce"
       - id: host
         shell: bash
@@ -251,22 +237,10 @@ jobs:
           name: artifacts
           path: dist-manifest.json
 
-  custom-host-greeter:
-    needs:
-      - plan
-      - build-local-artifacts
-      - build-global-artifacts
-      - custom-global-build-greeter
-    uses: ./.github/workflows/host-greeter.yml
-    with:
-      plan: ${{ needs.plan.outputs.val }}
-    secrets: inherit
-
   publish-homebrew-formula:
     needs:
       - plan
       - host
-      - custom-host-greeter
     runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -303,13 +277,13 @@ jobs:
     needs:
       - plan
       - host
-      - custom-host-greeter
     if: ${{ !fromJson(needs.plan.outputs.val).announcement_is_prerelease || fromJson(needs.plan.outputs.val).publish_prereleases }}
     uses: ./.github/workflows/publish-greeter.yml
     with:
       plan: ${{ needs.plan.outputs.val }}
     secrets: inherit
 
+  # Create an Announcement for all the Axo Releases, updating the "latest" release
   # Create a Github Release while uploading all files to it
   announce:
     needs:
@@ -317,7 +291,6 @@ jobs:
       - host
       - publish-homebrew-formula
       - custom-publish-greeter
-      - custom-host-greeter
     # use "always() && ..." to allow us to wait for all publish jobs while
     # still allowing individual publish jobs to skip themselves (for prereleases).
     # "host" however must run to completion, no skipping allowed!
@@ -325,10 +298,21 @@ jobs:
     runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      AXO_RELEASES_TOKEN: ${{ secrets.AXO_RELEASES_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: Install cargo-dist
+        run: "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/cargo-dist/releases/download/v0.6.0-prerelease.4/cargo-dist-installer.sh | sh"
+      - name: Fetch Axo Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: artifacts
+          path: target/distrib/
+      - name: Announce Axo Releases
+        run: |
+          cargo dist host --steps=announce ${{ needs.plan.outputs.tag-flag }}
       - name: "Download Github Artifacts"
         uses: actions/download-artifact@v3
         with:

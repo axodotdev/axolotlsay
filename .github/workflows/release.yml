@@ -64,7 +64,7 @@ jobs:
         # we specify bash to get pipefail; it guards against the `curl` command
         # failing. otherwise `sh` won't catch that `curl` returned non-0
         shell: bash
-        run: "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/cargo-dist/releases/download/v0.6.0-prerelease.4/cargo-dist-installer.sh | sh"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=fix-global cargo-dist"
       # sure would be cool if github gave us proper conditionals...
       # so here's a doubly-nested ternary-via-truthiness to try to provide the best possible
       # functionality based on whether this is a pull_request, and whether it's from a fork.
@@ -82,11 +82,17 @@ jobs:
           name: artifacts
           path: dist-manifest.json
 
+  custom-plan-greeter:
+    uses: ./.github/workflows/plan-greeter.yml
+    secrets: inherit
+
   # Build and packages all the platform-specific things
   build-local-artifacts:
     name: build-local-artifacts (${{ join(matrix.targets, ', ') }})
     # Let the initial task tell us to not run (currently very blunt)
-    needs: plan
+    needs:
+      - plan
+      - custom-plan-greeter
     if: ${{ fromJson(needs.plan.outputs.val).ci.github.artifacts_matrix.include != null && (needs.plan.outputs.publishing == 'true' || fromJson(needs.plan.outputs.val).ci.github.pr_run_mode == 'upload') }}
     strategy:
       fail-fast: false
@@ -147,21 +153,31 @@ jobs:
             ${{ steps.cargo-dist.outputs.paths }}
             ${{ env.BUILD_MANIFEST_NAME }}
 
+  custom-local-build-greeter:
+    needs:
+      - plan
+      - custom-plan-greeter
+    uses: ./.github/workflows/local-build-greeter.yml
+    with:
+      plan: ${{ needs.plan.outputs.val }}
+    secrets: inherit
+
   # Build and package all the platform-agnostic(ish) things
   build-global-artifacts:
     needs:
       - plan
       - build-local-artifacts
+      - custom-local-build-greeter
     runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      BUILD_MANIFEST_NAME: target/distrib/dist-manifest.json
+      BUILD_MANIFEST_NAME: target/distrib/global-dist-manifest.json
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/cargo-dist/releases/download/v0.6.0-prerelease.4/cargo-dist-installer.sh | sh"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=fix-global cargo-dist"
       # Get all the local artifacts for the global tasks to use (for e.g. checksums)
       - name: Fetch local artifacts
         uses: actions/download-artifact@v3
@@ -187,6 +203,16 @@ jobs:
           path: |
             ${{ steps.cargo-dist.outputs.paths }}
             ${{ env.BUILD_MANIFEST_NAME }}
+
+  custom-global-build-greeter:
+    needs:
+      - plan
+      - build-local-artifacts
+      - custom-local-build-greeter
+    uses: ./.github/workflows/global-build-greeter.yml
+    with:
+      plan: ${{ needs.plan.outputs.val }}
+    secrets: inherit
   # Uploads the artifacts to Axo Releases and tentatively creates Releases for them.
   # This makes perma URLs like /v1.0.0/ live for subsequent publish steps to use, but
   # leaves them "disconnected" from the release history (for the purposes of
@@ -202,6 +228,7 @@ jobs:
       - plan
       - build-local-artifacts
       - build-global-artifacts
+      - custom-global-build-greeter
     # Only run if we're "publishing", and only if local and global didn't fail (skipped is fine)
     if: ${{ always() && needs.plan.outputs.publishing == 'true' && (needs.build-global-artifacts.result == 'skipped' || needs.build-global-artifacts.result == 'success') && (needs.build-local-artifacts.result == 'skipped' || needs.build-local-artifacts.result == 'success') }}
     env:
@@ -215,7 +242,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/cargo-dist/releases/download/v0.6.0-prerelease.4/cargo-dist-installer.sh | sh"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=fix-global cargo-dist"
       # Fetch artifacts from scratch-storage
       - name: Fetch artifacts
         uses: actions/download-artifact@v3
@@ -237,10 +264,22 @@ jobs:
           name: artifacts
           path: dist-manifest.json
 
+  custom-host-greeter:
+    needs:
+      - plan
+      - build-local-artifacts
+      - build-global-artifacts
+      - custom-global-build-greeter
+    uses: ./.github/workflows/host-greeter.yml
+    with:
+      plan: ${{ needs.plan.outputs.val }}
+    secrets: inherit
+
   publish-homebrew-formula:
     needs:
       - plan
       - host
+      - custom-host-greeter
     runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -277,6 +316,7 @@ jobs:
     needs:
       - plan
       - host
+      - custom-host-greeter
     if: ${{ !fromJson(needs.plan.outputs.val).announcement_is_prerelease || fromJson(needs.plan.outputs.val).publish_prereleases }}
     uses: ./.github/workflows/publish-greeter.yml
     with:
@@ -291,6 +331,7 @@ jobs:
       - host
       - publish-homebrew-formula
       - custom-publish-greeter
+      - custom-host-greeter
     # use "always() && ..." to allow us to wait for all publish jobs while
     # still allowing individual publish jobs to skip themselves (for prereleases).
     # "host" however must run to completion, no skipping allowed!
@@ -304,7 +345,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install cargo-dist
-        run: "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/cargo-dist/releases/download/v0.6.0-prerelease.4/cargo-dist-installer.sh | sh"
+        run: "cargo install --git https://github.com/axodotdev/cargo-dist/ --branch=fix-global cargo-dist"
       - name: Fetch Axo Artifacts
         uses: actions/download-artifact@v3
         with:

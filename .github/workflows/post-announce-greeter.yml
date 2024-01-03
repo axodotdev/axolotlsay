@@ -1,0 +1,27 @@
+name: Greeter
+
+on:
+  workflow_call:
+    inputs:
+      plan:
+        required: true
+        type: string
+
+jobs:
+  greeter:
+    runs-on: ubuntu-latest
+    env:
+      PLAN: ${{ inputs.plan }}
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.plan.outputs.tag }}
+          submodules: recursive
+      - name: Step 1
+        run: |
+          git show | cat
+      - name: Step 2
+        run: |
+          echo "Hello!"
+          echo "Plan is: ${PLAN}"

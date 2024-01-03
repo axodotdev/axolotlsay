@@ -1,7 +1,7 @@
 [package]
 name = "axolotlsay"
 description = "💬 a CLI for learning to distribute CLIs in rust"
-version = "0.2.80"
+version = "0.2.81"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/mistydemeo/cargodisttest"
@@ -22,7 +22,7 @@ lto = "thin"
 # Config for 'cargo dist'
 [workspace.metadata.dist]
 # The preferred cargo-dist version to use in CI (Cargo.toml SemVer syntax)
-cargo-dist-version = "0.6.1-github-fix-global"
+cargo-dist-version = "0.6.3-github-post-announce-job"
 # CI backends to support
 ci = ["github"]
 # The installers to generate for each app
@@ -45,6 +45,8 @@ local-artifacts-jobs = ["./local-build-greeter"]
 global-artifacts-jobs = ["./global-build-greeter"]
 # Host jobs to run in CI
 host-jobs = ["./host-greeter"]
+# Post-announce jobs to run in CI
+post-announce-jobs = ["./post-announce-greeter"]
 # Whether to publish prereleases to package managers
 publish-prereleases = false
 # Publish jobs to run in CI

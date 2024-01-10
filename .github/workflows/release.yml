@@ -41,7 +41,7 @@ permissions:
 on:
   push:
     tags:
-      - "**[0-9]+.[0-9]+.[0-9]+*"
+      - '**[0-9]+.[0-9]+.[0-9]+*'
   pull_request:
 
 jobs:
@@ -56,7 +56,6 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       AXO_RELEASES_TOKEN: ${{ secrets.AXO_RELEASES_TOKEN }}
-      GAZENOT_API_SERVER: staging-axo-abyss.fly.dev
     steps:
       - uses: actions/checkout@v4
         with:
@@ -112,7 +111,6 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       BUILD_MANIFEST_NAME: target/distrib/${{ join(matrix.targets, '-') }}-dist-manifest.json
-      GAZENOT_API_SERVER: staging-axo-abyss.fly.dev
     steps:
       - uses: actions/checkout@v4
         with:
@@ -174,7 +172,6 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       BUILD_MANIFEST_NAME: target/distrib/global-dist-manifest.json
-      GAZENOT_API_SERVER: staging-axo-abyss.fly.dev
     steps:
       - uses: actions/checkout@v4
         with:
@@ -237,7 +234,6 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       AXO_RELEASES_TOKEN: ${{ secrets.AXO_RELEASES_TOKEN }}
-      GAZENOT_API_SERVER: staging-axo-abyss.fly.dev
     runs-on: "ubuntu-20.04"
     outputs:
       val: ${{ steps.host.outputs.manifest }}
@@ -290,7 +286,6 @@ jobs:
       PLAN: ${{ needs.plan.outputs.val }}
       GITHUB_USER: "axo bot"
       GITHUB_EMAIL: "admin+bot@axo.dev"
-      GAZENOT_API_SERVER: staging-axo-abyss.fly.dev
     if: ${{ !fromJson(needs.plan.outputs.val).announcement_is_prerelease || fromJson(needs.plan.outputs.val).publish_prereleases }}
     steps:
       - uses: actions/checkout@v4
@@ -345,7 +340,6 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       AXO_RELEASES_TOKEN: ${{ secrets.AXO_RELEASES_TOKEN }}
-      GAZENOT_API_SERVER: staging-axo-abyss.fly.dev
     steps:
       - uses: actions/checkout@v4
         with:

@@ -1,7 +1,7 @@
 [package]
 name = "axolotlsay"
 description = "💬 a CLI for learning to distribute CLIs in rust"
-version = "0.2.84"
+version = "0.2.85"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/mistydemeo/cargodisttest"
@@ -55,8 +55,6 @@ pr-run-mode = "plan"
 publish-jobs = ["homebrew", "./publish-greeter"]
 # Where to host releases
 hosting = ["github", "axodotdev"]
-# Skip checking whether the specified configuration files are up to date
-allow-dirty = ["ci"]
 
 [workspace.metadata.dist.dependencies.homebrew]
 cmake = '*'

@@ -55,6 +55,8 @@ pr-run-mode = "plan"
 publish-jobs = ["homebrew", "./publish-greeter"]
 # Where to host releases
 hosting = ["github", "axodotdev"]
+# Skip checking whether the specified configuration files are up to date
+allow-dirty = ["ci"]
 
 [workspace.metadata.dist.dependencies.homebrew]
 cmake = '*'

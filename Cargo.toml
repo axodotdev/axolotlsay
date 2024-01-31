@@ -1,12 +1,13 @@
 [package]
 name = "axolotlsay"
 description = "💬 a CLI for learning to distribute CLIs in rust"
-version = "0.2.93"
+version = "0.2.94"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/mistydemeo/cargodisttest"
 
 [dependencies]
+cue = "2.0.0"
 clap = { version = "4.1.4", features = ["derive"] }
 unicode-width = "0.1.10"
 
@@ -57,7 +58,7 @@ hosting = ["github", "axodotdev"]
 
 [workspace.metadata.dist.dependencies.homebrew]
 cmake = '*'
-libcue = { version = "2.2.1", targets = ["x86_64-apple-darwin"] }
+libcue = "2.2.1"
 
 [workspace.metadata.dist.dependencies.apt]
 cmake = '*'

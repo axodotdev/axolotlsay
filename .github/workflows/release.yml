@@ -122,7 +122,7 @@ jobs:
       - name: Fetch local artifacts
         uses: actions/download-artifact@v4
         with:
-          name: artifacts-*
+          pattern: artifacts-*
           path: target/distrib/
           merge-multiple: true
       - name: Install dependencies
@@ -184,7 +184,7 @@ jobs:
       - name: Fetch local artifacts
         uses: actions/download-artifact@v4
         with:
-          name: artifacts-*
+          pattern: artifacts-*
           path: target/distrib/
           merge-multiple: true
       - id: cargo-dist
@@ -250,7 +250,7 @@ jobs:
       - name: Fetch artifacts
         uses: actions/download-artifact@v4
         with:
-          name: artifacts-*
+          pattern: artifacts-*
           path: target/distrib/
           merge-multiple: true
       # Upload files to Axo Releases and create the Releases
@@ -301,7 +301,7 @@ jobs:
       - name: Fetch local artifacts
         uses: actions/download-artifact@v4
         with:
-          name: artifacts-*
+          pattern: artifacts-*
           path: Formula/
           merge-multiple: true
       - name: Commit formula files
@@ -359,7 +359,7 @@ jobs:
       - name: Fetch Axo Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: artifacts-*
+          pattern: artifacts-*
           path: target/distrib/
           merge-multiple: true
       - name: Announce Axo Releases
@@ -368,7 +368,7 @@ jobs:
       - name: "Download Github Artifacts"
         uses: actions/download-artifact@v4
         with:
-          name: artifacts-*
+          pattern: artifacts-*
           path: artifacts
           merge-multiple: true
       - name: Cleanup

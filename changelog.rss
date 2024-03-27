@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>axolotlsay Changelog</title><link>http://127.0.0.1:7979/axolotlsay/changelog</link><description>Changelog information for axolotlsay</description><category domain="https://github.com/axodotdev/axolotlsay">axolotlsay Changelog</category><atom:link href="http://127.0.0.1:7979/axolotlsay/changelog.rss" rel="self"/><item><title>Version 0.2.1</title><link>http://127.0.0.1:7979/axolotlsay/changelog/v0.2.1</link><category domain="https://github.com/axodotdev/axolotlsay">axolotlsay Changelog</category><guid>http://127.0.0.1:7979/axolotlsay/changelog/v0.2.1</guid><content:encoded><![CDATA[<pre style="background-color:#263238;"><span style="color:#eeffff;">         +--------------------------------------+
+</span><span style="color:#eeffff;">         | now with linux static musl binary!!! |
+</span><span style="color:#eeffff;">         +--------------------------------------+
+</span><span style="color:#eeffff;">        /
+</span><span style="color:#eeffff;">≽(◕ ᴗ ◕)≼
+</span></pre>
+
+]]></content:encoded></item><item><title>Version 0.2.0</title><link>http://127.0.0.1:7979/axolotlsay/changelog/v0.2.0</link><category domain="https://github.com/axodotdev/axolotlsay">axolotlsay Changelog</category><guid>http://127.0.0.1:7979/axolotlsay/changelog/v0.2.0</guid><content:encoded><![CDATA[<pre style="background-color:#263238;"><span style="color:#eeffff;">         +-----------------------------------------+
+</span><span style="color:#eeffff;">         | now with homebrew and msi installers!!! |
+</span><span style="color:#eeffff;">         +-----------------------------------------+
+</span><span style="color:#eeffff;">        /
+</span><span style="color:#eeffff;">≽(◕ ᴗ ◕)≼
+</span></pre>
+
+]]></content:encoded></item><item><title>Version 0.1.0</title><link>http://127.0.0.1:7979/axolotlsay/changelog/v0.1.0</link><category domain="https://github.com/axodotdev/axolotlsay">axolotlsay Changelog</category><guid>http://127.0.0.1:7979/axolotlsay/changelog/v0.1.0</guid><content:encoded><![CDATA[<pre style="background-color:#263238;"><span style="color:#eeffff;">         +------------------------+
+</span><span style="color:#eeffff;">         | the initial release!!! |
+</span><span style="color:#eeffff;">         +------------------------+
+</span><span style="color:#eeffff;">        /
+</span><span style="color:#eeffff;">≽(◕ ᴗ ◕)≼
+</span></pre>
+
+]]></content:encoded></item></channel></rss>

@@ -21,6 +21,8 @@ jobs:
         run: |
           $env:Home = "/"
           axolotlsay-update --version 0.3.3
+      - name: run it
+        run: axolotlsay -Version
   fix:
     runs-on: windows-latest
     steps:
@@ -30,6 +32,8 @@ jobs:
         run: axolotlsay -Version
       - name: update
         run: axolotlsay-update --version 0.3.3
+      - name: run it
+        run: axolotlsay -Version
   repro-bug:
     runs-on: windows-latest
     steps:

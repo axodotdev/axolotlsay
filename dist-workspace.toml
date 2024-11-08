@@ -24,7 +24,7 @@ publish-jobs = ["homebrew", "npm", "./publish-crates"]
 # Which actions to run on pull requests
 pr-run-mode = "plan"
 # Whether to install an updater program
-install-updater = false
+install-updater = true
 # Path that installers should place binaries in
 install-path = "CARGO_HOME"
 

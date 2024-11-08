@@ -10,6 +10,17 @@ env:
   RUSTFLAGS: -Dwarnings
 
 jobs:
+  fix-with-env:
+    runs-on: windows-latest
+    steps:
+      - name: install and update (no custom)
+        run: powershell -ExecutionPolicy ByPass -c "irm https://github.com/axodotdev/axolotlsay/releases/download/v0.3.2/axolotlsay-installer.ps1 | iex"
+      - name: run it
+        run: axolotlsay -Version
+      - name: update
+        run: |
+          $env:Home = "/"
+          axolotlsay-update --version 0.3.3
   fix:
     runs-on: windows-latest
     steps:

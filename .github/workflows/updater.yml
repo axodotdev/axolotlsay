@@ -1,0 +1,66 @@
+name: Updater
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+env:
+  RUSTFLAGS: -Dwarnings
+
+jobs:
+  fresh:
+    runs-on: windows-latest
+    steps:
+      - name: install and update (no custom)
+        run: powershell -ExecutionPolicy ByPass -c "irm https://github.com/axodotdev/axolotlsay/releases/download/v0.3.3/axolotlsay-installer.ps1 | iex"
+      - name: run it
+        run: axolotlsay -Version
+      - name: update
+        run: |
+          axolotlsay-update
+      - name: run it
+        run: axolotlsay -Version
+  fix-with-env:
+    runs-on: windows-latest
+    steps:
+      - name: install and update (no custom)
+        run: powershell -ExecutionPolicy ByPass -c "irm https://github.com/axodotdev/axolotlsay/releases/download/v0.3.2/axolotlsay-installer.ps1 | iex"
+      - name: run it
+        run: axolotlsay -Version
+      - name: update
+        run: |
+          $env:Home = "/"
+          axolotlsay-update --version 0.3.3
+      - name: run it
+        run: axolotlsay -Version
+  fix:
+    runs-on: windows-latest
+    steps:
+      - name: install and update (no custom)
+        run: powershell -ExecutionPolicy ByPass -c "irm https://github.com/axodotdev/axolotlsay/releases/download/v0.3.2/axolotlsay-installer.ps1 | iex"
+      - name: run it
+        run: axolotlsay -Version
+      - name: update
+        run: axolotlsay-update --version 0.3.3
+      - name: run it
+        run: axolotlsay -Version
+  repro-bug:
+    runs-on: windows-latest
+    steps:
+      - name: install and update (no custom)
+        run: powershell -ExecutionPolicy ByPass -c "irm https://github.com/axodotdev/axolotlsay/releases/download/v0.3.1/axolotlsay-installer.ps1 | iex"
+      - name: run it
+        run: axolotlsay -Version
+      - name: update
+        run: axolotlsay-update --version 0.3.2
+  original:
+    runs-on: windows-latest
+    steps:
+      - name: install and update (no custom)
+        run: powershell -ExecutionPolicy ByPass -c "irm https://github.com/axodotdev/axolotlsay/releases/download/v0.3.0/axolotlsay-installer.ps1 | iex"
+      - name: run it
+        run: axolotlsay -Version
+      - name: update
+        run: axolotlsay-update --version 0.3.1

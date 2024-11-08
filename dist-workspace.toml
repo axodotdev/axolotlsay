@@ -26,7 +26,7 @@ pr-run-mode = "plan"
 # Whether to install an updater program
 install-updater = true
 # Path that installers should place binaries in
-install-path = "~/axo"
+install-path = "CARGO_HOME"
 
 [dist.github-custom-runners]
 aarch64-unknown-linux-gnu = "buildjet-8vcpu-ubuntu-2204-arm"
